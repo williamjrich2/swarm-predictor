@@ -4,10 +4,10 @@
     { "src": "api/*.py", "use": "@vercel/python" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.py" },
+    { "src": "/api/predict_game", "dest": "/api/predict_game.py" },
+    { "src": "/api/predict_tournament", "dest": "/api/predict_tournament.py" },
+    { "src": "/api/bracket", "dest": "/api/bracket.py" },
+    { "src": "/api/chat", "dest": "/api/chat.py" },
     { "src": "/(.*)", "dest": "/index.html" }
-  ],
-  "env": {
-    "OPENROUTER_API_KEY": "@openrouter_api_key"
-  }
+  ]
 }
