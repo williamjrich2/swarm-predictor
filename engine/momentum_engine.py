@@ -1,3 +1,6 @@
+class Console:
+    def print(self, *a, **kw): pass
+
 """
 Momentum Engine
 
@@ -12,7 +15,6 @@ That's why they call it the madness.
 """
 
 import numpy as np
-from rich.console import Console
 
 console = Console()
 

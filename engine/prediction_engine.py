@@ -1,3 +1,6 @@
+class Console:
+    def print(self, *a, **kw): pass
+
 """
 Prediction Engine
 
@@ -14,7 +17,10 @@ The output is:
 """
 
 import numpy as np
-from rich.console import Console
+import sys as _sys
+class _FakeConsole:
+    def print(self, *a, **kw): pass
+_console_placeholder = True
 from .hard_score import HardScoreCalculator
 from .soft_score import SoftScoreCalculator
 from .chaos_score import ChaosScoreCalculator

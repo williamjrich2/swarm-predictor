@@ -1,3 +1,6 @@
+class Console:
+    def print(self, *a, **kw): pass
+
 """
 Soft Score Calculator
 
@@ -18,7 +21,6 @@ Factors:
 """
 
 import numpy as np
-from rich.console import Console
 
 try:
     from geopy.distance import geodesic

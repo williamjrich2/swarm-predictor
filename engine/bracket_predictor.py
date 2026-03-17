@@ -15,8 +15,12 @@ import json
 import random
 import numpy as np
 from pathlib import Path
-from rich.console import Console
-from rich.table import Table
+class Console:
+    def print(self, *a, **kw): pass
+class Table:
+    def __init__(self, *a, **kw): self.columns=[]
+    def add_column(self, *a, **kw): pass
+    def add_row(self, *a, **kw): pass
 from .prediction_engine import PredictionEngine
 
 console = Console()

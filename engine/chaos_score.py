@@ -1,3 +1,6 @@
+class Console:
+    def print(self, *a, **kw): pass
+
 """
 Chaos Score Calculator
 
@@ -22,7 +25,6 @@ import json
 import os
 import numpy as np
 from pathlib import Path
-from rich.console import Console
 
 console = Console()
 

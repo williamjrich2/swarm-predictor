@@ -16,8 +16,8 @@ Metrics used:
 """
 
 import numpy as np
-import pandas as pd
-from rich.console import Console
+class Console:
+    def print(self, *a, **kw): pass
 
 console = Console()
 
