@@ -162,6 +162,9 @@
     min-width: 900px;
     align-items: stretch;
   }
+  .bracket-region-reverse {
+    flex-direction: row-reverse;
+  }
   .bracket-round {
     display: flex;
     flex-direction: column;
@@ -871,6 +874,9 @@
     overflow-x: auto;
     padding: 8px;
   }
+  .bb-rounds-reverse {
+    flex-direction: row-reverse;
+  }
   .bb-round {
     display: flex;
     flex-direction: column;
@@ -1022,7 +1028,7 @@
       <div class="logo-sub">NCAA 2026 · Monte Carlo</div>
     </div>
   </div>
-  <div class="header-badge">49,999 Simulations</div>
+
 </header>
 
 <!-- Desktop Tab Nav -->
@@ -1351,7 +1357,7 @@
       <div class="card" style="margin-bottom:16px;">
         <div class="card-header">
           <span class="card-title">🏆 Champion Probability Odds</span>
-          <span id="simsLabel" style="font-size:11px; color:var(--text-3);"></span>
+          <span id="simsLabel" style="font-size:11px; color:var(--text-3); display:none;"></span>
         </div>
         <div class="card-body" style="padding:0;">
           <table class="odds-table">
@@ -2023,7 +2029,7 @@ function buildBracket() {
     wrapper.appendChild(label);
 
     const regionDiv = document.createElement('div');
-    regionDiv.className = 'bracket-region';
+    regionDiv.className = 'bracket-region' + ((region === 'South' || region === 'Midwest') ? ' bracket-region-reverse' : '');
 
     // R64
     const r64div = document.createElement('div');
@@ -2172,9 +2178,6 @@ function buildChampion() {
       <div class="champion-label">2026 National Champion</div>
       <div class="champion-name">${CHAMP.winner}</div>
       <div class="champion-score">${CHAMP.ws}–${CHAMP.ls} over ${CHAMP.loser}</div>
-      <div style="margin-top:12px; font-size:11px; color:#92400E; background:#FEF3C7; border-radius:6px; padding:6px 10px;">
-        ⚡ 49,999 simulations · Duke 17.1% champion odds
-      </div>
     </div>
   `;
 }
@@ -2737,7 +2740,7 @@ function renderBracketBuilder() {
     rDiv.appendChild(header);
 
     const rounds = document.createElement('div');
-    rounds.className = 'bb-rounds';
+    rounds.className = 'bb-rounds' + ((region === 'South' || region === 'Midwest') ? ' bb-rounds-reverse' : '');
 
     for (let ri = 0; ri < 4; ri++) {
       const roundDiv = document.createElement('div');
