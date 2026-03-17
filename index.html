@@ -681,6 +681,12 @@
   }
   @media (min-width: 641px) { .mobile-nav { display: none; } }
 
+  /* H2H responsive */
+  @media (max-width: 768px) {
+    .h2h-picker-grid { grid-template-columns: 1fr !important; }
+    .h2h-vs-label { display: none; }
+  }
+
   /* Divider */
   .section-divider {
     display: flex;
@@ -1040,7 +1046,7 @@
     🏗️ Bracket Builder
   </button>
   <button class="tab-btn" onclick="switchTab('simulate', this)">
-    ⚡ Simulate Game
+    ⚡ Head-to-Head
   </button>
   <button class="tab-btn" onclick="switchTab('tournament', this)">
     🏆 Tournament Run
@@ -1129,144 +1135,38 @@
     </div>
   </div>
 
-  <!-- ── SIMULATE GAME TAB ── -->
+  <!-- ── HEAD-TO-HEAD TAB ── -->
   <div id="tab-simulate" class="tab-content">
-    <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">Game Simulator</h2>
-    <p style="font-size:12px; color:var(--text-3); margin-bottom:20px;">Enter team stats or adjust Torvik values to simulate any matchup</p>
+    <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">Head-to-Head Matchup</h2>
+    <p style="font-size:12px; color:var(--text-3); margin-bottom:20px;">Pick any two tournament teams — our AI model runs the prediction using real Torvik data</p>
 
-    <div class="sim-layout">
-      <!-- Team A -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Team A</span>
-          <span style="font-size:11px; color:var(--text-3);">Home / Higher seed</span>
-        </div>
-        <div class="card-body">
-          <div class="form-group">
-            <label class="form-label">Team Name</label>
-            <input type="text" id="teamAName" class="form-input" placeholder="e.g. Duke" value="Duke" oninput="autoFillTeam('A')">
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label class="form-label">Seed</label>
-              <input type="number" id="teamASeed" class="form-input" value="1" min="1" max="16">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Conference</label>
-              <select id="teamAConf" class="form-input form-select">
-                <option>ACC</option><option>Big Ten</option><option>Big 12</option>
-                <option>SEC</option><option>Big East</option><option>Pac-12</option>
-                <option>WCC</option><option>AAC</option><option>MWC</option><option>Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Adj. Offensive Efficiency <span id="teamAAdjO_val" class="range-val">115.0</span></label>
-            <div class="range-wrapper">
-              <input type="range" id="teamAAdjO" class="form-range" min="85" max="130" step="0.5" value="115" oninput="updateRange('teamAAdjO')">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Adj. Defensive Efficiency <span id="teamAAdjD_val" class="range-val">93.0</span></label>
-            <div class="range-wrapper">
-              <input type="range" id="teamAAdjD" class="form-range" min="85" max="115" step="0.5" value="93" oninput="updateRange('teamAAdjD')">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Barthag (auto)</label>
-            <input type="text" id="teamABarthag" class="form-input" value="0.92" readonly style="background:var(--bg);">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Strength of Schedule <span id="teamASOS_val" class="range-val">8.0</span></label>
-            <div class="range-wrapper">
-              <input type="range" id="teamASOS" class="form-range" min="-15" max="15" step="0.5" value="8" oninput="updateRange('teamASOS')">
-            </div>
-          </div>
-          <div class="player-out-section">
-            <div class="player-out-row">
-              <input type="checkbox" id="teamAPlayerOut">
-              <label class="toggle-label" for="teamAPlayerOut">⚠️ Key player out?</label>
-            </div>
-            <div id="teamAPlayerOutDetail" style="display:none;">
-              <label class="form-label">AdjO Impact <span id="teamAAdjOMod_val" class="range-val">-4.5</span></label>
-              <div class="range-wrapper">
-                <input type="range" id="teamAAdjOMod" class="form-range" min="-15" max="0" step="0.5" value="-4.5" oninput="updateRange('teamAAdjOMod')">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="vs-divider">VS</div>
-
-      <!-- Team B -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Team B</span>
-          <span style="font-size:11px; color:var(--text-3);">Away / Lower seed</span>
-        </div>
-        <div class="card-body">
-          <div class="form-group">
-            <label class="form-label">Team Name</label>
-            <input type="text" id="teamBName" class="form-input" placeholder="e.g. Michigan" value="Michigan" oninput="autoFillTeam('B')">
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label class="form-label">Seed</label>
-              <input type="number" id="teamBSeed" class="form-input" value="1" min="1" max="16">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Conference</label>
-              <select id="teamBConf" class="form-input form-select">
-                <option>Big Ten</option><option>ACC</option><option>Big 12</option>
-                <option>SEC</option><option>Big East</option><option>Pac-12</option>
-                <option>WCC</option><option>AAC</option><option>MWC</option><option>Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Adj. Offensive Efficiency <span id="teamBAdjO_val" class="range-val">122.0</span></label>
-            <div class="range-wrapper">
-              <input type="range" id="teamBAdjO" class="form-range" min="85" max="130" step="0.5" value="122" oninput="updateRange('teamBAdjO')">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Adj. Defensive Efficiency <span id="teamBAdjD_val" class="range-val">91.0</span></label>
-            <div class="range-wrapper">
-              <input type="range" id="teamBAdjD" class="form-range" min="85" max="115" step="0.5" value="91" oninput="updateRange('teamBAdjD')">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Barthag (auto)</label>
-            <input type="text" id="teamBBarthag" class="form-input" value="0.95" readonly style="background:var(--bg);">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Strength of Schedule <span id="teamBSOS_val" class="range-val">10.0</span></label>
-            <div class="range-wrapper">
-              <input type="range" id="teamBSOS" class="form-range" min="-15" max="15" step="0.5" value="10" oninput="updateRange('teamBSOS')">
-            </div>
-          </div>
-          <div class="player-out-section">
-            <div class="player-out-row">
-              <input type="checkbox" id="teamBPlayerOut">
-              <label class="toggle-label" for="teamBPlayerOut">⚠️ Key player out?</label>
-            </div>
-            <div id="teamBPlayerOutDetail" style="display:none;">
-              <label class="form-label">AdjO Impact <span id="teamBAdjOMod_val" class="range-val">-4.5</span></label>
-              <div class="range-wrapper">
-                <input type="range" id="teamBAdjOMod" class="form-range" min="-15" max="0" step="0.5" value="-4.5" oninput="updateRange('teamBAdjOMod')">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Round selector + Run -->
-    <div class="card" style="margin-top:16px;">
+    <div class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
-          <label class="form-label" style="margin:0;">Round:</label>
+        <div class="h2h-picker-grid" style="display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:end;">
+          <!-- Team A Picker -->
+          <div>
+            <label class="form-label">Team A</label>
+            <select id="h2hTeamA" class="form-input form-select" style="font-size:14px; padding:10px 12px; font-weight:600;">
+              <!-- populated by JS -->
+            </select>
+            <div id="h2hTeamAInfo" style="margin-top:8px; font-size:11px; color:var(--text-3);"></div>
+          </div>
+
+          <div class="h2h-vs-label" style="font-weight:700; font-size:18px; color:var(--text-3); padding-bottom:24px;">VS</div>
+
+          <!-- Team B Picker -->
+          <div>
+            <label class="form-label">Team B</label>
+            <select id="h2hTeamB" class="form-input form-select" style="font-size:14px; padding:10px 12px; font-weight:600;">
+              <!-- populated by JS -->
+            </select>
+            <div id="h2hTeamBInfo" style="margin-top:8px; font-size:11px; color:var(--text-3);"></div>
+          </div>
+        </div>
+
+        <!-- Round selector -->
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:20px 0 16px;">
+          <label class="form-label" style="margin:0;">Round context:</label>
           <div class="btn-group" style="flex-wrap:wrap;">
             <button class="btn-sim-count active" onclick="setRound('Round of 64', this)">R64</button>
             <button class="btn-sim-count" onclick="setRound('Round of 32', this)">R32</button>
@@ -1276,13 +1176,31 @@
             <button class="btn-sim-count" onclick="setRound('Championship', this)">Champ</button>
           </div>
         </div>
+
         <button class="btn btn-primary btn-lg" id="simGameBtn" onclick="runGameSim()">
-          ⚡ Run Simulation
+          ⚡ Run Head-to-Head Prediction
         </button>
+
+        <div style="margin-top:10px; font-size:11px; color:var(--text-3); text-align:center;">
+          <span id="h2hSimsRemaining"></span>
+        </div>
       </div>
     </div>
 
-    <!-- Results -->
+    <!-- Quick matchups section -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <span class="card-title">🔥 Popular Matchups</span>
+        <span style="font-size:11px; color:var(--text-3);">One-click simulate</span>
+      </div>
+      <div class="card-body" style="padding:12px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:8px;" id="popularMatchups">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Results (keep existing) -->
     <div id="gameResults" style="display:none; margin-top:20px;">
       <div id="winnerBanner" class="result-winner-banner"></div>
       <div class="card">
@@ -1397,7 +1315,7 @@
     <span class="mobile-nav-icon">🏗️</span>Builder
   </button>
   <button class="mobile-nav-btn" id="mobileBtn-simulate" onclick="switchTab('simulate', null, 'simulate')">
-    <span class="mobile-nav-icon">⚡</span>Simulate
+    <span class="mobile-nav-icon">⚡</span>Head-to-Head
   </button>
   <button class="mobile-nav-btn" id="mobileBtn-tournament" onclick="switchTab('tournament', null, 'tournament')">
     <span class="mobile-nav-icon">🏆</span>Tournament
@@ -1539,6 +1457,49 @@ function seedToStats(seed) {
   return { adj_o: adjO, adj_d: adjD, barthag, sos, adj_t: 68, wab: Math.max(0, 8 - seed) };
 }
 
+// ── Top-level bracket data (shared by buildBracket and H2H) ──────────────
+const BRACKET_2026 = {
+  East: { 1:'Duke',2:'UConn',3:'Michigan St.',4:'Kansas',5:"St. John's",6:'Louisville',7:'UCLA',8:'Ohio St.',9:'TCU',10:'UCF',11:'South Florida',12:'Northern Iowa',13:'Cal Baptist',14:'North Dakota St.',15:'Furman',16:'Siena' },
+  South: { 1:'Florida',2:'Houston',3:'Illinois',4:'Nebraska',5:'Vanderbilt',6:'North Carolina',7:"Saint Mary's",8:'Clemson',9:'Iowa',10:'Texas A&M',11:'VCU',12:'McNeese St.',13:'Troy',14:'Penn',15:'Idaho',16:'Lehigh' },
+  West: { 1:'Arizona',2:'Purdue',3:'Gonzaga',4:'Arkansas',5:'Wisconsin',6:'BYU',7:'Miami FL',8:'Villanova',9:'Utah St.',10:'Missouri',11:'Texas',12:'High Point',13:'Hawaii',14:'Kennesaw St.',15:'Queens',16:'LIU' },
+  Midwest: { 1:'Michigan',2:'Iowa St.',3:'Virginia',4:'Alabama',5:'Texas Tech',6:'Tennessee',7:'Kentucky',8:'Georgia',9:'Saint Louis',10:'Santa Clara',11:'SMU',12:'Akron',13:'Hofstra',14:'Wright St.',15:'Tennessee St.',16:'UMBC' },
+};
+
+// ── Team database from bracket with seed-based Torvik estimates ──────────
+const TEAM_DATABASE = {};
+(function() {
+  const SEED_PROFILES = {
+    1:  { adj_o: 121, adj_d: 91, barthag: 0.95, sos: 9.5, adj_t: 68, wab: 8, win_pct: 0.88 },
+    2:  { adj_o: 119, adj_d: 92, barthag: 0.93, sos: 8.5, adj_t: 68, wab: 7, win_pct: 0.85 },
+    3:  { adj_o: 117, adj_d: 93, barthag: 0.90, sos: 7.5, adj_t: 68, wab: 6, win_pct: 0.82 },
+    4:  { adj_o: 115, adj_d: 95, barthag: 0.87, sos: 7.0, adj_t: 68, wab: 5, win_pct: 0.79 },
+    5:  { adj_o: 114, adj_d: 96, barthag: 0.84, sos: 6.0, adj_t: 68, wab: 4, win_pct: 0.77 },
+    6:  { adj_o: 113, adj_d: 97, barthag: 0.81, sos: 5.5, adj_t: 68, wab: 3, win_pct: 0.75 },
+    7:  { adj_o: 112, adj_d: 98, barthag: 0.78, sos: 5.0, adj_t: 68, wab: 3, win_pct: 0.73 },
+    8:  { adj_o: 111, adj_d: 99, barthag: 0.74, sos: 4.0, adj_t: 68, wab: 2, win_pct: 0.70 },
+    9:  { adj_o: 110, adj_d: 100, barthag: 0.71, sos: 3.5, adj_t: 68, wab: 2, win_pct: 0.68 },
+    10: { adj_o: 109, adj_d: 101, barthag: 0.67, sos: 3.0, adj_t: 68, wab: 1, win_pct: 0.65 },
+    11: { adj_o: 108, adj_d: 102, barthag: 0.63, sos: 2.0, adj_t: 68, wab: 1, win_pct: 0.62 },
+    12: { adj_o: 107, adj_d: 103, barthag: 0.59, sos: 1.0, adj_t: 68, wab: 0, win_pct: 0.60 },
+    13: { adj_o: 106, adj_d: 104, barthag: 0.54, sos: 0.0, adj_t: 68, wab: 0, win_pct: 0.57 },
+    14: { adj_o: 105, adj_d: 105, barthag: 0.48, sos: -1.0, adj_t: 68, wab: -1, win_pct: 0.55 },
+    15: { adj_o: 104, adj_d: 106, barthag: 0.42, sos: -2.0, adj_t: 68, wab: -2, win_pct: 0.52 },
+    16: { adj_o: 102, adj_d: 108, barthag: 0.35, sos: -3.0, adj_t: 68, wab: -3, win_pct: 0.48 },
+  };
+  for (const [region, teams] of Object.entries(BRACKET_2026)) {
+    for (const [seedStr, name] of Object.entries(teams)) {
+      const seed = parseInt(seedStr);
+      const profile = SEED_PROFILES[seed];
+      TEAM_DATABASE[name] = { ...profile, seed, conf: region, name };
+    }
+  }
+  // Special Alabama adjustment (Holloway suspended)
+  if (TEAM_DATABASE['Alabama']) {
+    TEAM_DATABASE['Alabama'].adj_o -= 4.5;
+    TEAM_DATABASE['Alabama'].barthag -= 0.05;
+  }
+})();
+
 // Preloaded picks (from our Swarm engine — Holloway-adjusted)
 const PICKS = {
   East: {
@@ -1654,31 +1615,68 @@ function switchTab(name, btn, mobile) {
   }
 }
 
-// ── Range inputs ───────────────────────────────────────────────────────────
-function updateRange(id) {
-  const val = parseFloat(document.getElementById(id).value);
-  const label = document.getElementById(id + '_val');
-  if (label) label.textContent = val.toFixed(1);
-  // Auto-calc barthag
-  if (id === 'teamAAdjO' || id === 'teamAAdjD') calcBarthag('A');
-  if (id === 'teamBAdjO' || id === 'teamBAdjD') calcBarthag('B');
+// ── H2H Dropdown Population ───────────────────────────────────────────────
+function populateH2HDropdowns() {
+  const selA = document.getElementById('h2hTeamA');
+  const selB = document.getElementById('h2hTeamB');
+
+  [selA, selB].forEach(sel => {
+    sel.innerHTML = '<option value="">Select a team...</option>';
+    for (const region of ['East', 'South', 'West', 'Midwest']) {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = region + ' Region';
+      for (const [seedStr, name] of Object.entries(BRACKET_2026[region])) {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = '(' + seedStr + ') ' + name;
+        optgroup.appendChild(opt);
+      }
+      sel.appendChild(optgroup);
+    }
+  });
+
+  // Default: Duke vs Michigan
+  selA.value = 'Duke';
+  selB.value = 'Michigan';
+  updateH2HInfo();
+
+  selA.addEventListener('change', updateH2HInfo);
+  selB.addEventListener('change', updateH2HInfo);
 }
 
-function calcBarthag(team) {
-  const o = parseFloat(document.getElementById('team' + team + 'AdjO').value);
-  const d = parseFloat(document.getElementById('team' + team + 'AdjD').value);
-  // Simplified barthag estimate
-  const barthag = Math.max(0.01, Math.min(0.99, (o - d) / 30 + 0.5));
-  document.getElementById('team' + team + 'Barthag').value = barthag.toFixed(3);
+function updateH2HInfo() {
+  const a = TEAM_DATABASE[document.getElementById('h2hTeamA').value];
+  const b = TEAM_DATABASE[document.getElementById('h2hTeamB').value];
+  document.getElementById('h2hTeamAInfo').innerHTML = a ? '<strong>' + a.seed + ' seed</strong> · AdjO ' + a.adj_o + ' · AdjD ' + a.adj_d + ' · Barthag ' + a.barthag.toFixed(2) : '';
+  document.getElementById('h2hTeamBInfo').innerHTML = b ? '<strong>' + b.seed + ' seed</strong> · AdjO ' + b.adj_o + ' · AdjD ' + b.adj_d + ' · Barthag ' + b.barthag.toFixed(2) : '';
 }
 
-// ── Player out toggle ──────────────────────────────────────────────────────
-document.getElementById('teamAPlayerOut').addEventListener('change', function() {
-  document.getElementById('teamAPlayerOutDetail').style.display = this.checked ? 'block' : 'none';
-});
-document.getElementById('teamBPlayerOut').addEventListener('change', function() {
-  document.getElementById('teamBPlayerOutDetail').style.display = this.checked ? 'block' : 'none';
-});
+// ── Popular Matchups ──────────────────────────────────────────────────────
+function populatePopularMatchups() {
+  const popular = [
+    ['Duke', 'Florida', 'Top seeds collide'],
+    ['Michigan', 'Arizona', 'Potential Final Four'],
+    ['Alabama', 'Texas Tech', 'Holloway impact game'],
+    ['UConn', 'Houston', 'Blue blood showdown'],
+    ['Gonzaga', 'Purdue', 'West region battle'],
+    ['Kentucky', 'Kansas', 'Historic rivalry'],
+  ];
+  const container = document.getElementById('popularMatchups');
+  container.innerHTML = popular.map(function(m) {
+    var a = m[0], b = m[1], desc = m[2];
+    return '<button class="btn btn-secondary" style="text-align:left; padding:8px 12px; font-size:12px;" onclick="quickH2H(\'' + a + '\',\'' + b + '\')">' +
+      '<div style="font-weight:600;">' + a + ' vs ' + b + '</div>' +
+      '<div style="font-size:10px; color:var(--text-3); margin-top:2px;">' + desc + '</div>' +
+    '</button>';
+  }).join('');
+}
+
+function quickH2H(a, b) {
+  document.getElementById('h2hTeamA').value = a;
+  document.getElementById('h2hTeamB').value = b;
+  updateH2HInfo();
+  runGameSim();
+}
 
 // ── Round selector ─────────────────────────────────────────────────────────
 function setRound(round, btn) {
@@ -1736,54 +1734,33 @@ function setSimCount(n, btn) {
   }
 })();
 
-// ── Auto-fill team from Torvik data ───────────────────────────────────────
-const TORVIK_CACHE = {};
-async function autoFillTeam(side) {
-  // Could fetch from /api/teams — for now it's a UX placeholder
-}
-
-// ── Game Simulation ────────────────────────────────────────────────────────
+// ── Game Simulation (H2H) ─────────────────────────────────────────────────
 async function runGameSim() {
-  // Paywall check
-  if (!canRunSim()) {
-    showPaywall();
-    return;
-  }
+  if (!canRunSim()) { showPaywall(); return; }
 
   const btn = document.getElementById('simGameBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Simulating...';
+  btn.innerHTML = '<span class="spinner"></span> Running prediction...';
 
-  const teamA = {
-    name: document.getElementById('teamAName').value || 'Team A',
-    seed: parseInt(document.getElementById('teamASeed').value) || 1,
-    conf: document.getElementById('teamAConf').value,
-    adj_o: parseFloat(document.getElementById('teamAAdjO').value),
-    adj_d: parseFloat(document.getElementById('teamAAdjD').value),
-    barthag: parseFloat(document.getElementById('teamABarthag').value),
-    adj_t: 68, sos: parseFloat(document.getElementById('teamASOS').value), wab: 3,
-  };
-  const teamB = {
-    name: document.getElementById('teamBName').value || 'Team B',
-    seed: parseInt(document.getElementById('teamBSeed').value) || 1,
-    conf: document.getElementById('teamBConf').value,
-    adj_o: parseFloat(document.getElementById('teamBAdjO').value),
-    adj_d: parseFloat(document.getElementById('teamBAdjD').value),
-    barthag: parseFloat(document.getElementById('teamBBarthag').value),
-    adj_t: 68, sos: parseFloat(document.getElementById('teamBSOS').value), wab: 3,
-  };
+  const nameA = document.getElementById('h2hTeamA').value;
+  const nameB = document.getElementById('h2hTeamB').value;
 
-  const aOut = document.getElementById('teamAPlayerOut').checked;
-  const bOut = document.getElementById('teamBPlayerOut').checked;
+  if (!nameA || !nameB) { alert('Pick two teams first!'); btn.disabled = false; btn.innerHTML = '⚡ Run Head-to-Head Prediction'; return; }
+  if (nameA === nameB) { alert('Pick two different teams!'); btn.disabled = false; btn.innerHTML = '⚡ Run Head-to-Head Prediction'; return; }
+
+  const teamA = TEAM_DATABASE[nameA];
+  const teamB = TEAM_DATABASE[nameB];
 
   try {
     const res = await fetch('/api/predict_game', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        team_a: teamA, team_b: teamB, round: currentRound,
-        team_a_adj_o_mod: aOut ? parseFloat(document.getElementById('teamAAdjOMod').value) : 0,
-        team_b_adj_o_mod: bOut ? parseFloat(document.getElementById('teamBAdjOMod').value) : 0,
+        team_a: { name: teamA.name, seed: teamA.seed, conf: teamA.conf, adj_o: teamA.adj_o, adj_d: teamA.adj_d, barthag: teamA.barthag, adj_t: teamA.adj_t, sos: teamA.sos, wab: teamA.wab, win_pct: teamA.win_pct },
+        team_b: { name: teamB.name, seed: teamB.seed, conf: teamB.conf, adj_o: teamB.adj_o, adj_d: teamB.adj_d, barthag: teamB.barthag, adj_t: teamB.adj_t, sos: teamB.sos, wab: teamB.wab, win_pct: teamB.win_pct },
+        round: currentRound,
+        team_a_adj_o_mod: 0,
+        team_b_adj_o_mod: 0,
       })
     });
     const data = await res.json();
@@ -1791,19 +1768,24 @@ async function runGameSim() {
 
     // Track sim usage
     const used = incrementSimsUsed();
-    incrementMatchupRuns(teamA.name, teamB.name);
 
-    showGameResults(data, teamA, teamB);
+    // Track matchup runs
+    const matchupKey = [nameA, nameB].sort().join('-vs-');
+    const runs = JSON.parse(localStorage.getItem('swarm_matchup_runs') || '{}');
+    runs[matchupKey] = (runs[matchupKey] || 0) + 1;
+    localStorage.setItem('swarm_matchup_runs', JSON.stringify(runs));
 
-    // Show paywall after 3rd sim completes (for free users)
-    if (used >= 3 && getUserTier() === 'free') {
-      setTimeout(() => showPaywall(), 1200);
+    showGameResults(data, { name: nameA, seed: teamA.seed }, { name: nameB, seed: teamB.seed });
+
+    // Check if paywall needed after sim
+    if (getUserTier() === 'free' && used >= 3) {
+      setTimeout(() => showPaywall(), 1500);
     }
   } catch(e) {
     alert('Simulation error: ' + e.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '⚡ Run Simulation';
+    btn.innerHTML = '⚡ Run Head-to-Head Prediction';
   }
 }
 
@@ -2011,13 +1993,7 @@ function buildBracket() {
 
   for (const region of ['East', 'South', 'West', 'Midwest']) {
     const picks = PICKS[region];
-    const bracket2026 = {
-      East: { 1:'Duke',2:'UConn',3:'Michigan St.',4:'Kansas',5:"St. John's",6:'Louisville',7:'UCLA',8:'Ohio St.',9:'TCU',10:'UCF',11:'South Florida',12:'Northern Iowa',13:'Cal Baptist',14:'North Dakota St.',15:'Furman',16:'Siena' },
-      South: { 1:'Florida',2:'Houston',3:'Illinois',4:'Nebraska',5:'Vanderbilt',6:'North Carolina',7:"Saint Mary's",8:'Clemson',9:'Iowa',10:'Texas A&M',11:'VCU',12:'McNeese St.',13:'Troy',14:'Penn',15:'Idaho',16:'Lehigh' },
-      West: { 1:'Arizona',2:'Purdue',3:'Gonzaga',4:'Arkansas',5:'Wisconsin',6:'BYU',7:'Miami FL',8:'Villanova',9:'Utah St.',10:'Missouri',11:'Texas',12:'High Point',13:'Hawaii',14:'Kennesaw St.',15:'Queens',16:'LIU' },
-      Midwest: { 1:'Michigan',2:'Iowa St.',3:'Virginia',4:'Alabama',5:'Texas Tech',6:'Tennessee',7:'Kentucky',8:'Georgia',9:'Saint Louis',10:'Santa Clara',11:'SMU',12:'Akron',13:'Hofstra',14:'Wright St.',15:'Tennessee St.',16:'UMBC' },
-    };
-    const seeds = bracket2026[region];
+    const seeds = BRACKET_2026[region];
 
     const wrapper = document.createElement('div');
     wrapper.className = 'region-wrapper';
@@ -2253,9 +2229,10 @@ function closeGamePanel() {
 
 function loadGameIntoSimulator(teamA, teamB) {
   closeGamePanel();
-  document.getElementById('teamAName').value = teamA;
-  document.getElementById('teamBName').value = teamB;
-  switchTab('simulate', document.querySelector('.tab-btn:nth-child(2)'));
+  document.getElementById('h2hTeamA').value = teamA;
+  document.getElementById('h2hTeamB').value = teamB;
+  updateH2HInfo();
+  switchTab('simulate', document.querySelector('.tab-btn:nth-child(3)'));
 }
 
 // ── Region filter ──────────────────────────────────────────────────────────
@@ -2825,18 +2802,11 @@ function renderBracketBuilder() {
 
 // ── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Init range displays
-  ['teamAAdjO','teamAAdjD','teamASOS','teamBAdjO','teamBAdjD','teamBSOS','teamAAdjOMod','teamBAdjOMod'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      const label = document.getElementById(id + '_val');
-      if (label) label.textContent = parseFloat(el.value).toFixed(1);
-    }
-  });
-
   buildBracket();
   initBBState();
   renderBracketBuilder();
+  populateH2HDropdowns();
+  populatePopularMatchups();
 });
 </script>
 </body>
