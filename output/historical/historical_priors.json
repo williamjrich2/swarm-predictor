@@ -1,0 +1,198 @@
+{
+  "upset_rates": {
+    "1_vs_8": 0.2703,
+    "2_vs_7": 0.2857,
+    "3_vs_6": 0.2778,
+    "4_vs_5": 0.4444,
+    "1_vs_16": 0.014,
+    "2_vs_15": 0.065,
+    "3_vs_14": 0.13,
+    "4_vs_13": 0.2,
+    "5_vs_12": 0.362,
+    "6_vs_11": 0.37,
+    "7_vs_10": 0.401,
+    "8_vs_9": 0.49
+  },
+  "seed_advancement_rates": {
+    "1": {
+      "first_four": 0.0,
+      "round_of_64": 0.833,
+      "round_of_32": 0.583,
+      "sweet_16": 0.556,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "2": {
+      "first_four": 0.0,
+      "round_of_64": 0.722,
+      "round_of_32": 0.0,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "3": {
+      "first_four": 0.0,
+      "round_of_64": 0.75,
+      "round_of_32": 0.0,
+      "sweet_16": 0.194,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "4": {
+      "first_four": 0.0,
+      "round_of_64": 0.556,
+      "round_of_32": 0.0,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "5": {
+      "first_four": 0.0,
+      "round_of_64": 0.472,
+      "round_of_32": 0.333,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "6": {
+      "first_four": 0.0,
+      "round_of_64": 0.278,
+      "round_of_32": 0.278,
+      "sweet_16": 0.028,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "7": {
+      "first_four": 0.0,
+      "round_of_64": 0.278,
+      "round_of_32": 0.278,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "8": {
+      "first_four": 0.0,
+      "round_of_64": 0.278,
+      "round_of_32": 0.0,
+      "sweet_16": 0.111,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "9": {
+      "first_four": 0.0,
+      "round_of_64": 0.028,
+      "round_of_32": 0.0,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "10": {
+      "first_four": 0.0,
+      "round_of_64": 0.0,
+      "round_of_32": 0.111,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "11": {
+      "first_four": 0.0,
+      "round_of_64": 0.028,
+      "round_of_32": 0.333,
+      "sweet_16": 0.111,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "12": {
+      "first_four": 0.0,
+      "round_of_64": 0.0,
+      "round_of_32": 0.056,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "13": {
+      "first_four": 0.0,
+      "round_of_64": 0.0,
+      "round_of_32": 0.0,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "14": {
+      "first_four": 0.0,
+      "round_of_64": 0.0,
+      "round_of_32": 0.0,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "15": {
+      "first_four": 0.0,
+      "round_of_64": 0.0,
+      "round_of_32": 0.0,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    },
+    "16": {
+      "first_four": 0.0,
+      "round_of_64": 0.0,
+      "round_of_32": 0.028,
+      "sweet_16": 0.0,
+      "elite_8": 0.0,
+      "final_four": 0.0,
+      "championship": 0.0
+    }
+  },
+  "cinderella_conferences": {
+    "Unknown": {
+      "cinderella_runs": 23,
+      "avg_rounds_exceeded": 0.42,
+      "total_tournament_appearances": 156
+    },
+    "P12": {
+      "cinderella_runs": 1,
+      "avg_rounds_exceeded": 0.67,
+      "total_tournament_appearances": 3
+    },
+    "A10": {
+      "cinderella_runs": 1,
+      "avg_rounds_exceeded": 2.0,
+      "total_tournament_appearances": 1
+    }
+  },
+  "momentum_correlation": {
+    "win_streak_3plus": 0.58,
+    "win_streak_7plus": 0.64,
+    "conf_champ_bonus": 0.56,
+    "fatigue_3games_7days": -0.07,
+    "hot_scoring_trend": 0.61,
+    "note": "Approximate values. Refine with game-by-game data."
+  },
+  "pillar_disagreement_outcomes": {
+    "hard_wins_when_agree": 0.72,
+    "soft_wins_when_disagree": 0.44,
+    "note": "When Hard and Soft pillars disagree, Hard score is correct ~56% of the time."
+  },
+  "data_quality": {
+    "tournament_games_in_db": 260,
+    "team_season_records": 1089,
+    "years_with_bracket_data": 9,
+    "generated_at": "2026-03-16T23:11:13.675357"
+  }
+}

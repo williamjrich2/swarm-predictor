@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swarm Predictor — NCAA 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #FAFAFA;
+    --surface: #FFFFFF;
+    --surface-hover: #F4F4F5;
+    --border: #E4E4E7;
+    --border-light: #F1F1F3;
+    --primary: #6366F1;
+    --primary-light: #EEF2FF;
+    --primary-hover: #4F46E5;
+    --text: #18181B;
+    --text-2: #52525B;
+    --text-3: #A1A1AA;
+    --success: #22C55E;
+    --success-light: #F0FDF4;
+    --warning: #F59E0B;
+    --warning-light: #FFFBEB;
+    --danger: #EF4444;
+    --danger-light: #FEF2F2;
+    --gold: #F59E0B;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --font: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .logo-text { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text-3); font-weight: 400; }
+  .header-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid #C7D2FE;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ── Tab Nav ── */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    border-bottom: 2px solid transparent;
+    transition: all 150ms;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--surface-hover); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  /* ── Main ── */
+  .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-title { font-weight: 600; font-size: 14px; }
+  .card-body { padding: 20px; }
+
+  /* ── Bracket ── */
+  .bracket-container {
+    overflow-x: auto;
+    padding-bottom: 16px;
+  }
+  .bracket-regions { display: flex; flex-direction: column; gap: 32px; }
+
+  .region-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .region-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    padding: 0 4px;
+  }
+  .bracket-region {
+    display: flex;
+    gap: 0;
+    min-width: 900px;
+    align-items: stretch;
+  }
+  .bracket-round {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    flex: 1;
+    min-width: 140px;
+    padding: 0 4px;
+    position: relative;
+  }
+  .round-header {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    text-align: center;
+    padding: 6px 0;
+    margin-bottom: 4px;
+  }
+  .matchup {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 4px 0;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 150ms;
+    flex: 1;
+    max-height: 56px;
+  }
+  .matchup:hover { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .team-slot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: var(--surface);
+    transition: background 100ms;
+    min-height: 26px;
+    position: relative;
+  }
+  .team-slot.winner { background: var(--primary-light); }
+  .team-slot.loser { opacity: 0.45; }
+  .seed-badge {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-3);
+    min-width: 14px;
+    font-family: var(--mono);
+  }
+  .team-name {
+    font-size: 11px;
+    font-weight: 500;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .team-slot.winner .team-name { color: var(--primary); font-weight: 600; }
+  .team-score {
+    font-size: 10px;
+    font-weight: 600;
+    font-family: var(--mono);
+    color: var(--text-2);
+  }
+  .team-slot.winner .team-score { color: var(--primary); }
+  .upset-tag {
+    background: var(--danger);
+    color: white;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    letter-spacing: 0.03em;
+  }
+  .alert-tag {
+    background: var(--warning);
+    color: white;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* Champion slot */
+  .champion-slot {
+    background: linear-gradient(135deg, #FFF7ED 0%, #FFFBEB 100%);
+    border: 1px solid #FCD34D;
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+  }
+  .champion-trophy { font-size: 32px; margin-bottom: 8px; }
+  .champion-name { font-size: 18px; font-weight: 700; color: var(--text); }
+  .champion-score { font-size: 13px; color: var(--text-2); margin-top: 4px; font-family: var(--mono); }
+  .champion-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 8px; }
+
+  /* Final Four section */
+  .final-four-section {
+    margin-top: 32px;
+  }
+  .final-four-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+  }
+  .ff-matchup-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .ff-matchup-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 12px;
+  }
+  .ff-team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+  }
+  .ff-team.winner { background: var(--primary-light); }
+  .ff-team.loser { opacity: 0.5; }
+  .ff-team-seed {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-3);
+    min-width: 16px;
+    font-family: var(--mono);
+  }
+  .ff-team-name { font-weight: 600; font-size: 13px; flex: 1; }
+  .ff-team.winner .ff-team-name { color: var(--primary); }
+  .ff-team-score { font-family: var(--mono); font-size: 12px; color: var(--text-2); }
+  .ff-team.winner .ff-team-score { color: var(--primary); font-weight: 700; }
+
+  /* ── Game Simulator ── */
+  .sim-layout {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 768px) {
+    .sim-layout { grid-template-columns: 1fr; }
+    .vs-divider { display: none; }
+    .bracket-region { min-width: 700px; }
+  }
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-3);
+  }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    margin-bottom: 5px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color 150ms, box-shadow 150ms;
+    outline: none;
+  }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  .form-select { appearance: none; cursor: pointer; }
+  .range-wrapper { display: flex; align-items: center; gap: 8px; }
+  .form-range {
+    flex: 1;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+  .range-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--primary);
+    min-width: 38px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .player-out-section {
+    background: var(--warning-light);
+    border: 1px solid #FDE68A;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 8px;
+  }
+  .player-out-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .toggle-label { font-size: 12px; font-weight: 500; color: var(--text-2); }
+  input[type="checkbox"] { accent-color: var(--warning); width: 14px; height: 14px; cursor: pointer; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 150ms;
+    white-space: nowrap;
+    min-height: 36px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--surface-hover); }
+  .btn-lg { padding: 12px 24px; font-size: 14px; width: 100%; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-group .btn { flex: 1; }
+  .btn-sim-count {
+    background: var(--surface);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .btn-sim-count.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: #C7D2FE;
+  }
+
+  /* ── Results ── */
+  .result-winner-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, #4F46E5 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .result-winner-name { font-size: 20px; font-weight: 700; }
+  .result-winner-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+  .result-score {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .result-score-label { font-size: 10px; opacity: 0.7; text-align: right; }
+
+  .prob-bar-wrapper { margin-bottom: 20px; }
+  .prob-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .prob-bar-track {
+    height: 8px;
+    background: #E0E7FF;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .prob-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 99px;
+    transition: width 600ms ease-out;
+  }
+  .prob-pcts {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--mono);
+  }
+
+  .pillar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .pillar-grid { grid-template-columns: 1fr; } }
+  .pillar-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+  .pillar-name {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+  .pillar-score {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--mono);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .pillar-score.good { color: var(--success); }
+  .pillar-score.neutral { color: var(--warning); }
+  .pillar-score.bad { color: var(--danger); }
+  .pillar-desc { font-size: 11px; color: var(--text-3); }
+
+  /* ── Tournament Tab ── */
+  .tourn-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .sim-count-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .adjustments-section {
+    background: var(--warning-light);
+    border: 1px solid #FDE68A;
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+  .adj-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #FDE68A;
+  }
+  .adj-row:last-child { border-bottom: none; }
+  .adj-team { font-weight: 600; font-size: 13px; flex: 1; }
+  .adj-note { font-size: 11px; color: var(--text-3); }
+
+  /* Progress bar */
+  .progress-wrapper { margin: 16px 0; display: none; }
+  .progress-label { font-size: 12px; color: var(--text-2); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 200ms;
+  }
+
+  /* Odds table */
+  .odds-table { width: 100%; border-collapse: collapse; }
+  .odds-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .odds-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-light); }
+  .odds-table tr:last-child td { border-bottom: none; }
+  .odds-table tr:hover td { background: var(--surface-hover); }
+  .odds-rank { font-size: 11px; font-weight: 700; color: var(--text-3); font-family: var(--mono); }
+  .odds-team { font-weight: 600; font-size: 13px; }
+  .odds-pct { font-family: var(--mono); font-weight: 700; font-size: 13px; }
+  .odds-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 3px;
+    min-width: 60px;
+  }
+  .odds-bar-fill { height: 100%; border-radius: 99px; }
+
+  /* Seed color coding */
+  .seed-1-4 { color: var(--primary); }
+  .seed-5-8 { color: #7C3AED; }
+  .seed-9-12 { color: var(--warning); }
+  .seed-13up { color: var(--text-3); }
+
+  /* Loading spinner */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 600ms linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1)} }
+
+  /* Alert */
+  .alert {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .alert-warning {
+    background: var(--warning-light);
+    border: 1px solid #FDE68A;
+    color: #92400E;
+  }
+  .alert-info {
+    background: var(--primary-light);
+    border: 1px solid #C7D2FE;
+    color: #3730A3;
+  }
+
+  /* Tooltip */
+  .tooltip-wrapper { position: relative; display: inline-block; }
+  .tooltip {
+    position: absolute;
+    background: #18181B;
+    color: white;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms;
+    z-index: 99;
+  }
+  .tooltip-wrapper:hover .tooltip { opacity: 1; }
+
+  /* Mobile bottom nav */
+  @media (max-width: 640px) {
+    .tab-nav { display: none; }
+    .mobile-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      z-index: 100;
+    }
+    .mobile-nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 4px 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 10px;
+      font-family: var(--font);
+      font-weight: 500;
+      color: var(--text-3);
+      gap: 3px;
+      transition: color 150ms;
+    }
+    .mobile-nav-btn.active { color: var(--primary); }
+    .mobile-nav-icon { font-size: 20px; }
+    .main { padding: 16px 16px 80px; }
+    .final-four-grid { grid-template-columns: 1fr; }
+    .ff-vs { display: none; }
+  }
+  @media (min-width: 641px) { .mobile-nav { display: none; } }
+
+  /* Divider */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+  }
+
+  /* Region filter on mobile */
+  .region-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .region-tab-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 150ms;
+  }
+  .region-tab-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  /* Game Detail Panel */
+  .game-panel {
+    position: fixed;
+    top: 0; right: -400px;
+    width: 380px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    transition: right 300ms ease;
+    overflow-y: auto;
+    padding: 0;
+  }
+  .game-panel.open { right: 0; }
+  .game-panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+  .game-panel-title { font-weight: 600; font-size: 14px; }
+  .game-panel-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-3);
+    padding: 4px;
+    border-radius: 4px;
+  }
+  .game-panel-close:hover { background: var(--surface-hover); color: var(--text); }
+  .game-panel-body { padding: 20px; }
+  .panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 199;
+    display: none;
+  }
+  .panel-overlay.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-icon">🏀</div>
+    <div>
+      <div class="logo-text">Swarm Predictor</div>
+      <div class="logo-sub">NCAA 2026 · Monte Carlo</div>
+    </div>
+  </div>
+  <div class="header-badge">49,999 Simulations</div>
+</header>
+
+<!-- Desktop Tab Nav -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('bracket', this)">
+    📋 Bracket
+  </button>
+  <button class="tab-btn" onclick="switchTab('simulate', this)">
+    ⚡ Simulate Game
+  </button>
+  <button class="tab-btn" onclick="switchTab('tournament', this)">
+    🏆 Tournament Run
+  </button>
+  <button class="tab-btn" onclick="switchTab('chat', this)">
+    💬 Swarm AI
+  </button>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- ── BRACKET TAB ── -->
+  <div id="tab-bracket" class="tab-content active">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h2 style="font-size:16px; font-weight:700;">2026 NCAA Tournament Bracket</h2>
+        <p style="font-size:12px; color:var(--text-3); margin-top:2px;">Click any matchup to see detailed pillar scores</p>
+      </div>
+      <div class="alert alert-warning" style="margin:0; padding:8px 12px;">
+        ⚠️ Alabama's Aden Holloway suspended — picks adjusted
+      </div>
+    </div>
+
+    <div class="region-tabs" id="regionTabs">
+      <button class="region-tab-btn active" onclick="filterRegion('all', this)">All Regions</button>
+      <button class="region-tab-btn" onclick="filterRegion('East', this)">East</button>
+      <button class="region-tab-btn" onclick="filterRegion('South', this)">South</button>
+      <button class="region-tab-btn" onclick="filterRegion('West', this)">West</button>
+      <button class="region-tab-btn" onclick="filterRegion('Midwest', this)">Midwest</button>
+    </div>
+
+    <div class="bracket-container">
+      <div class="bracket-regions" id="bracketRegions">
+        <!-- Dynamically built -->
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">Final Four · Indianapolis · April 4</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="final-four-grid" id="finalFourGrid">
+      <!-- Built dynamically -->
+    </div>
+
+    <div class="section-divider" style="margin-top:24px;">
+      <div class="divider-line"></div>
+      <div class="divider-text">National Championship · April 6</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div id="championSlot" style="max-width:360px; margin:0 auto;"></div>
+  </div>
+
+  <!-- ── SIMULATE GAME TAB ── -->
+  <div id="tab-simulate" class="tab-content">
+    <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">Game Simulator</h2>
+    <p style="font-size:12px; color:var(--text-3); margin-bottom:20px;">Enter team stats or adjust Torvik values to simulate any matchup</p>
+
+    <div class="sim-layout">
+      <!-- Team A -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Team A</span>
+          <span style="font-size:11px; color:var(--text-3);">Home / Higher seed</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Team Name</label>
+            <input type="text" id="teamAName" class="form-input" placeholder="e.g. Duke" value="Duke" oninput="autoFillTeam('A')">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label class="form-label">Seed</label>
+              <input type="number" id="teamASeed" class="form-input" value="1" min="1" max="16">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Conference</label>
+              <select id="teamAConf" class="form-input form-select">
+                <option>ACC</option><option>Big Ten</option><option>Big 12</option>
+                <option>SEC</option><option>Big East</option><option>Pac-12</option>
+                <option>WCC</option><option>AAC</option><option>MWC</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adj. Offensive Efficiency <span id="teamAAdjO_val" class="range-val">115.0</span></label>
+            <div class="range-wrapper">
+              <input type="range" id="teamAAdjO" class="form-range" min="85" max="130" step="0.5" value="115" oninput="updateRange('teamAAdjO')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adj. Defensive Efficiency <span id="teamAAdjD_val" class="range-val">93.0</span></label>
+            <div class="range-wrapper">
+              <input type="range" id="teamAAdjD" class="form-range" min="85" max="115" step="0.5" value="93" oninput="updateRange('teamAAdjD')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Barthag (auto)</label>
+            <input type="text" id="teamABarthag" class="form-input" value="0.92" readonly style="background:var(--bg);">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Strength of Schedule <span id="teamASOS_val" class="range-val">8.0</span></label>
+            <div class="range-wrapper">
+              <input type="range" id="teamASOS" class="form-range" min="-15" max="15" step="0.5" value="8" oninput="updateRange('teamASOS')">
+            </div>
+          </div>
+          <div class="player-out-section">
+            <div class="player-out-row">
+              <input type="checkbox" id="teamAPlayerOut">
+              <label class="toggle-label" for="teamAPlayerOut">⚠️ Key player out?</label>
+            </div>
+            <div id="teamAPlayerOutDetail" style="display:none;">
+              <label class="form-label">AdjO Impact <span id="teamAAdjOMod_val" class="range-val">-4.5</span></label>
+              <div class="range-wrapper">
+                <input type="range" id="teamAAdjOMod" class="form-range" min="-15" max="0" step="0.5" value="-4.5" oninput="updateRange('teamAAdjOMod')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vs-divider">VS</div>
+
+      <!-- Team B -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Team B</span>
+          <span style="font-size:11px; color:var(--text-3);">Away / Lower seed</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Team Name</label>
+            <input type="text" id="teamBName" class="form-input" placeholder="e.g. Michigan" value="Michigan" oninput="autoFillTeam('B')">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label class="form-label">Seed</label>
+              <input type="number" id="teamBSeed" class="form-input" value="1" min="1" max="16">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Conference</label>
+              <select id="teamBConf" class="form-input form-select">
+                <option>Big Ten</option><option>ACC</option><option>Big 12</option>
+                <option>SEC</option><option>Big East</option><option>Pac-12</option>
+                <option>WCC</option><option>AAC</option><option>MWC</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adj. Offensive Efficiency <span id="teamBAdjO_val" class="range-val">122.0</span></label>
+            <div class="range-wrapper">
+              <input type="range" id="teamBAdjO" class="form-range" min="85" max="130" step="0.5" value="122" oninput="updateRange('teamBAdjO')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adj. Defensive Efficiency <span id="teamBAdjD_val" class="range-val">91.0</span></label>
+            <div class="range-wrapper">
+              <input type="range" id="teamBAdjD" class="form-range" min="85" max="115" step="0.5" value="91" oninput="updateRange('teamBAdjD')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Barthag (auto)</label>
+            <input type="text" id="teamBBarthag" class="form-input" value="0.95" readonly style="background:var(--bg);">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Strength of Schedule <span id="teamBSOS_val" class="range-val">10.0</span></label>
+            <div class="range-wrapper">
+              <input type="range" id="teamBSOS" class="form-range" min="-15" max="15" step="0.5" value="10" oninput="updateRange('teamBSOS')">
+            </div>
+          </div>
+          <div class="player-out-section">
+            <div class="player-out-row">
+              <input type="checkbox" id="teamBPlayerOut">
+              <label class="toggle-label" for="teamBPlayerOut">⚠️ Key player out?</label>
+            </div>
+            <div id="teamBPlayerOutDetail" style="display:none;">
+              <label class="form-label">AdjO Impact <span id="teamBAdjOMod_val" class="range-val">-4.5</span></label>
+              <div class="range-wrapper">
+                <input type="range" id="teamBAdjOMod" class="form-range" min="-15" max="0" step="0.5" value="-4.5" oninput="updateRange('teamBAdjOMod')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Round selector + Run -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-body">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+          <label class="form-label" style="margin:0;">Round:</label>
+          <div class="btn-group" style="flex-wrap:wrap;">
+            <button class="btn-sim-count active" onclick="setRound('Round of 64', this)">R64</button>
+            <button class="btn-sim-count" onclick="setRound('Round of 32', this)">R32</button>
+            <button class="btn-sim-count" onclick="setRound('Sweet 16', this)">S16</button>
+            <button class="btn-sim-count" onclick="setRound('Elite 8', this)">E8</button>
+            <button class="btn-sim-count" onclick="setRound('Final Four', this)">FF</button>
+            <button class="btn-sim-count" onclick="setRound('Championship', this)">Champ</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg" id="simGameBtn" onclick="runGameSim()">
+          ⚡ Run Simulation
+        </button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="gameResults" style="display:none; margin-top:20px;">
+      <div id="winnerBanner" class="result-winner-banner"></div>
+      <div class="card">
+        <div class="card-body">
+          <div class="prob-bar-wrapper">
+            <div class="prob-bar-labels">
+              <span id="probLabelA">Team A</span>
+              <span id="probLabelB">Team B</span>
+            </div>
+            <div class="prob-bar-track">
+              <div class="prob-bar-fill" id="probBarFill" style="width:50%;"></div>
+            </div>
+            <div class="prob-pcts">
+              <span id="probPctA">50%</span>
+              <span id="probPctB">50%</span>
+            </div>
+          </div>
+          <div class="pillar-grid" id="pillarGrid"></div>
+          <div id="upsetIndicator"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOURNAMENT RUN TAB ── -->
+  <div id="tab-tournament" class="tab-content">
+    <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">Full Tournament Simulation</h2>
+    <p style="font-size:12px; color:var(--text-3); margin-bottom:20px;">Run thousands of simulations to generate champion probability odds</p>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header"><span class="card-title">Simulation Settings</span></div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Number of Simulations</label>
+          <div class="sim-count-row">
+            <button class="btn-sim-count" onclick="setSimCount(1000, this)">1,000</button>
+            <button class="btn-sim-count active" onclick="setSimCount(10000, this)">10,000</button>
+            <button class="btn-sim-count" onclick="setSimCount(49999, this)">49,999</button>
+          </div>
+          <p style="font-size:11px; color:var(--text-3); margin-top:6px;" id="simTimeEst">~10,000 sims takes about 30-40 seconds</p>
+        </div>
+
+        <div class="adjustments-section">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <span style="font-size:12px; font-weight:600; color:#92400E;">⚠️ Player Adjustments</span>
+            <span style="font-size:11px; color:#B45309;">Active adjustments affect sim results</span>
+          </div>
+          <div class="adj-row">
+            <input type="checkbox" id="adj_bama" checked>
+            <div style="flex:1;">
+              <div class="adj-team">Alabama</div>
+              <div class="adj-note">Aden Holloway suspended — felony arrest · AdjO -4.5, Barthag -0.05</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrapper" id="progressWrapper">
+          <div class="progress-label">
+            <span id="progressText">Simulating...</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" style="margin-top:16px;" id="runTournBtn" onclick="runTournament()">
+          🏆 Run Tournament Simulation
+        </button>
+      </div>
+    </div>
+
+    <div id="tournResults" style="display:none;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <span class="card-title">🏆 Champion Probability Odds</span>
+          <span id="simsLabel" style="font-size:11px; color:var(--text-3);"></span>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table class="odds-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Team</th>
+                <th>Title %</th>
+                <th>Final Four %</th>
+                <th>Sweet 16 %</th>
+              </tr>
+            </thead>
+            <tbody id="oddsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="applyBracketPicks()" style="margin-bottom:16px;">
+        📋 View Most Likely Bracket →
+      </button>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><span class="card-title">🚨 Upset Watch (R64)</span></div>
+        <div class="card-body" id="upsetWatchBody"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Mobile Nav -->
+<nav class="mobile-nav">
+  <button class="mobile-nav-btn active" id="mobileBtn-bracket" onclick="switchTab('bracket', null, 'bracket')">
+    <span class="mobile-nav-icon">📋</span>Bracket
+  </button>
+  <button class="mobile-nav-btn" id="mobileBtn-simulate" onclick="switchTab('simulate', null, 'simulate')">
+    <span class="mobile-nav-icon">⚡</span>Simulate
+  </button>
+  <button class="mobile-nav-btn" id="mobileBtn-tournament" onclick="switchTab('tournament', null, 'tournament')">
+    <span class="mobile-nav-icon">🏆</span>Tournament
+  </button>
+  <button class="mobile-nav-btn" id="mobileBtn-chat" onclick="switchTab('chat', null, 'chat')">
+    <span class="mobile-nav-icon">💬</span>AI Chat
+  </button>
+</nav>
+
+  <!-- ── CHAT TAB ── -->
+  <div id="tab-chat" class="tab-content">
+    <div style="max-width:680px; margin:0 auto;">
+      <div style="margin-bottom:20px;">
+        <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">💬 Swarm AI — NCAA Analyst</h2>
+        <p style="font-size:12px; color:var(--text-3);">Ask anything about the bracket, odds, upsets, or player situations</p>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-body" style="padding:0;">
+          <!-- Chat messages -->
+          <div id="chatMessages" style="height:420px; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <!-- Welcome message -->
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <div style="width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">🏀</div>
+              <div style="background:var(--bg); border:1px solid var(--border); border-radius:12px; border-top-left-radius:4px; padding:12px 14px; max-width:85%;">
+                <div style="font-size:13px; line-height:1.5; color:var(--text);">Hey! I'm <strong>Swarm</strong>, your NCAA tournament analyst. I've run <strong>49,999 Monte Carlo simulations</strong> of the 2026 bracket.<br><br>Ask me about any team's odds, upset picks, the <strong>Holloway situation</strong>, or why our model picks Duke to win it all. What do you want to know?</div>
+                <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Swarm AI · Powered by OpenRouter</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggested prompts -->
+          <div id="chatSuggestions" style="padding:0 16px 12px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" style="font-size:11px; padding:5px 10px;" onclick="sendSuggestion(this)">Who wins it all?</button>
+            <button class="btn btn-secondary" style="font-size:11px; padding:5px 10px;" onclick="sendSuggestion(this)">Best upset picks?</button>
+            <button class="btn btn-secondary" style="font-size:11px; padding:5px 10px;" onclick="sendSuggestion(this)">Holloway impact on Alabama?</button>
+            <button class="btn btn-secondary" style="font-size:11px; padding:5px 10px;" onclick="sendSuggestion(this)">Sleeper teams to watch?</button>
+          </div>
+
+          <!-- Input -->
+          <div style="border-top:1px solid var(--border); padding:12px 16px; display:flex; gap:8px; align-items:flex-end;">
+            <textarea id="chatInput" placeholder="Ask about any team, pick, or strategy..." style="flex:1; resize:none; border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-family:var(--font); font-size:13px; color:var(--text); outline:none; min-height:42px; max-height:120px; transition:border-color 150ms;" rows="1"
+              onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChat();}"
+              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+            <button id="chatSendBtn" class="btn btn-primary" onclick="sendChat()" style="padding:10px 16px; min-height:42px;">
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:var(--text-3); text-align:center;">
+        Powered by <strong>DeepSeek R1</strong> via OpenRouter (free tier) · NCAA context pre-loaded
+      </div>
+    </div>
+  </div>
+
+<!-- Game Detail Panel -->
+<div class="panel-overlay" id="panelOverlay" onclick="closeGamePanel()"></div>
+<div class="game-panel" id="gamePanel">
+  <div class="game-panel-header">
+    <span class="game-panel-title" id="gamePanelTitle">Game Details</span>
+    <button class="game-panel-close" onclick="closeGamePanel()">✕</button>
+  </div>
+  <div class="game-panel-body" id="gamePanelBody">
+    <div style="text-align:center; padding:40px; color:var(--text-3);">
+      <div class="spinner" style="margin:0 auto 12px;"></div>
+      Loading...
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let currentRound = 'Round of 64';
+let simCount = 10000;
+let bracketData = null;
+let tournamentBracketPicks = null;
+
+// Preloaded picks (from our Swarm engine — Holloway-adjusted)
+const PICKS = {
+  East: {
+    r64: [
+      { winner: 'Duke', loser: 'Siena', ws: 78, ls: 72, ws_seed: 1, ls_seed: 16, upset: false, upset_prob: 0.08 },
+      { winner: 'Ohio St.', loser: 'TCU', ws: 78, ls: 77, ws_seed: 8, ls_seed: 9, upset: false, upset_prob: 0.48 },
+      { winner: "St. John's", loser: 'Northern Iowa', ws: 75, ls: 73, ws_seed: 5, ls_seed: 12, upset: false, upset_prob: 0.38 },
+      { winner: 'Kansas', loser: 'Cal Baptist', ws: 75, ls: 73, ws_seed: 4, ls_seed: 13, upset: false, upset_prob: 0.22 },
+      { winner: 'Louisville', loser: 'South Florida', ws: 78, ls: 76, ws_seed: 6, ls_seed: 11, upset: false, upset_prob: 0.36 },
+      { winner: 'Michigan St.', loser: 'North Dakota St.', ws: 76, ls: 73, ws_seed: 3, ls_seed: 14, upset: false, upset_prob: 0.15 },
+      { winner: 'UCLA', loser: 'UCF', ws: 79, ls: 78, ws_seed: 7, ls_seed: 10, upset: false, upset_prob: 0.42 },
+      { winner: 'UConn', loser: 'Furman', ws: 75, ls: 72, ws_seed: 2, ls_seed: 15, upset: false, upset_prob: 0.10 },
+    ],
+    r32: [
+      { winner: 'Duke', loser: 'Ohio St.', ws: 79, ls: 77, ws_seed: 1, ls_seed: 8, upset: false },
+      { winner: "St. John's", loser: 'Kansas', ws: 75, ls: 74, ws_seed: 5, ls_seed: 4, upset: true },
+      { winner: 'Michigan St.', loser: 'Louisville', ws: 77, ls: 76, ws_seed: 3, ls_seed: 6, upset: false },
+      { winner: 'UCLA', loser: 'UConn', ws: 77, ls: 75, ws_seed: 7, ls_seed: 2, upset: true },
+    ],
+    s16: [
+      { winner: 'Duke', loser: "St. John's", ws: 76, ls: 75, ws_seed: 1, ls_seed: 5, upset: false },
+      { winner: 'Michigan St.', loser: 'UCLA', ws: 78, ls: 77, ws_seed: 3, ls_seed: 7, upset: false },
+    ],
+    e8: { winner: 'Duke', loser: 'Michigan St.', ws: 77, ls: 76, ws_seed: 1, ls_seed: 3 },
+  },
+  South: {
+    r64: [
+      { winner: 'Florida', loser: 'Lehigh', ws: 78, ls: 72, ws_seed: 1, ls_seed: 16, upset: false, upset_prob: 0.09 },
+      { winner: 'Clemson', loser: 'Iowa', ws: 76, ls: 75, ws_seed: 8, ls_seed: 9, upset: false, upset_prob: 0.50 },
+      { winner: 'Vanderbilt', loser: 'McNeese St.', ws: 78, ls: 77, ws_seed: 5, ls_seed: 12, upset: false, upset_prob: 0.39 },
+      { winner: 'Nebraska', loser: 'Troy', ws: 75, ls: 72, ws_seed: 4, ls_seed: 13, upset: false, upset_prob: 0.20 },
+      { winner: 'North Carolina', loser: 'VCU', ws: 78, ls: 77, ws_seed: 6, ls_seed: 11, upset: false, upset_prob: 0.40 },
+      { winner: 'Illinois', loser: 'Penn', ws: 79, ls: 75, ws_seed: 3, ls_seed: 14, upset: false, upset_prob: 0.16 },
+      { winner: "Saint Mary's", loser: 'Texas A&M', ws: 77, ls: 76, ws_seed: 7, ls_seed: 10, upset: false, upset_prob: 0.44 },
+      { winner: 'Houston', loser: 'Idaho', ws: 78, ls: 73, ws_seed: 2, ls_seed: 15, upset: false, upset_prob: 0.10 },
+    ],
+    r32: [
+      { winner: 'Florida', loser: 'Clemson', ws: 76, ls: 75, ws_seed: 1, ls_seed: 8, upset: false },
+      { winner: 'Vanderbilt', loser: 'Nebraska', ws: 77, ls: 76, ws_seed: 5, ls_seed: 4, upset: true },
+      { winner: 'Illinois', loser: 'North Carolina', ws: 79, ls: 78, ws_seed: 3, ls_seed: 6, upset: false },
+      { winner: 'Houston', loser: "Saint Mary's", ws: 77, ls: 76, ws_seed: 2, ls_seed: 7, upset: false },
+    ],
+    s16: [
+      { winner: 'Florida', loser: 'Vanderbilt', ws: 78, ls: 77, ws_seed: 1, ls_seed: 5, upset: false },
+      { winner: 'Houston', loser: 'Illinois', ws: 78, ls: 77, ws_seed: 2, ls_seed: 3, upset: false },
+    ],
+    e8: { winner: 'Florida', loser: 'Houston', ws: 76, ls: 75, ws_seed: 1, ls_seed: 2 },
+  },
+  West: {
+    r64: [
+      { winner: 'Arizona', loser: 'LIU', ws: 78, ls: 71, ws_seed: 1, ls_seed: 16, upset: false, upset_prob: 0.08 },
+      { winner: 'Utah St.', loser: 'Villanova', ws: 78, ls: 77, ws_seed: 9, ls_seed: 8, upset: true, upset_prob: 0.54 },
+      { winner: 'Wisconsin', loser: 'High Point', ws: 80, ls: 78, ws_seed: 5, ls_seed: 12, upset: false, upset_prob: 0.37 },
+      { winner: 'Arkansas', loser: 'Hawaii', ws: 79, ls: 76, ws_seed: 4, ls_seed: 13, upset: false, upset_prob: 0.21 },
+      { winner: 'BYU', loser: 'Texas', ws: 78, ls: 77, ws_seed: 6, ls_seed: 11, upset: false, upset_prob: 0.43 },
+      { winner: 'Gonzaga', loser: 'Kennesaw St.', ws: 77, ls: 73, ws_seed: 3, ls_seed: 14, upset: false, upset_prob: 0.14 },
+      { winner: 'Miami FL', loser: 'Missouri', ws: 78, ls: 77, ws_seed: 7, ls_seed: 10, upset: false, upset_prob: 0.43 },
+      { winner: 'Purdue', loser: 'Queens', ws: 81, ls: 76, ws_seed: 2, ls_seed: 15, upset: false, upset_prob: 0.09 },
+    ],
+    r32: [
+      { winner: 'Arizona', loser: 'Utah St.', ws: 78, ls: 77, ws_seed: 1, ls_seed: 9, upset: false },
+      { winner: 'Arkansas', loser: 'Wisconsin', ws: 80, ls: 78, ws_seed: 4, ls_seed: 5, upset: true },
+      { winner: 'Gonzaga', loser: 'BYU', ws: 78, ls: 77, ws_seed: 3, ls_seed: 6, upset: false },
+      { winner: 'Purdue', loser: 'Miami FL', ws: 80, ls: 79, ws_seed: 2, ls_seed: 7, upset: false },
+    ],
+    s16: [
+      { winner: 'Arizona', loser: 'Arkansas', ws: 79, ls: 78, ws_seed: 1, ls_seed: 4, upset: false },
+      { winner: 'Purdue', loser: 'Gonzaga', ws: 79, ls: 78, ws_seed: 2, ls_seed: 3, upset: false },
+    ],
+    e8: { winner: 'Arizona', loser: 'Purdue', ws: 79, ls: 78, ws_seed: 1, ls_seed: 2 },
+  },
+  Midwest: {
+    r64: [
+      { winner: 'Michigan', loser: 'UMBC', ws: 78, ls: 72, ws_seed: 1, ls_seed: 16, upset: false, upset_prob: 0.07 },
+      { winner: 'Georgia', loser: 'Saint Louis', ws: 79, ls: 78, ws_seed: 8, ls_seed: 9, upset: false, upset_prob: 0.49 },
+      { winner: 'Texas Tech', loser: 'Akron', ws: 79, ls: 78, ws_seed: 5, ls_seed: 12, upset: false, upset_prob: 0.38 },
+      { winner: 'Alabama', loser: 'Hofstra', ws: 77, ls: 74, ws_seed: 4, ls_seed: 13, upset: false, upset_prob: 0.23, alert: true },
+      { winner: 'Tennessee', loser: 'SMU', ws: 76, ls: 75, ws_seed: 6, ls_seed: 11, upset: false, upset_prob: 0.41 },
+      { winner: 'Virginia', loser: 'Wright St.', ws: 77, ls: 74, ws_seed: 3, ls_seed: 14, upset: false, upset_prob: 0.16 },
+      { winner: 'Kentucky', loser: 'Santa Clara', ws: 79, ls: 78, ws_seed: 7, ls_seed: 10, upset: false, upset_prob: 0.43 },
+      { winner: 'Iowa St.', loser: 'Tennessee St.', ws: 77, ls: 72, ws_seed: 2, ls_seed: 15, upset: false, upset_prob: 0.09 },
+    ],
+    r32: [
+      { winner: 'Michigan', loser: 'Georgia', ws: 79, ls: 78, ws_seed: 1, ls_seed: 8, upset: false },
+      { winner: 'Texas Tech', loser: 'Alabama', ws: 75, ls: 74, ws_seed: 5, ls_seed: 4, upset: true, alert: true },
+      { winner: 'Virginia', loser: 'Tennessee', ws: 76, ls: 75, ws_seed: 3, ls_seed: 6, upset: false },
+      { winner: 'Iowa St.', loser: 'Kentucky', ws: 77, ls: 76, ws_seed: 2, ls_seed: 7, upset: false },
+    ],
+    s16: [
+      { winner: 'Michigan', loser: 'Texas Tech', ws: 79, ls: 78, ws_seed: 1, ls_seed: 5, upset: false },
+      { winner: 'Iowa St.', loser: 'Virginia', ws: 76, ls: 75, ws_seed: 2, ls_seed: 3, upset: false },
+    ],
+    e8: { winner: 'Michigan', loser: 'Iowa St.', ws: 76, ls: 75, ws_seed: 1, ls_seed: 2 },
+  }
+};
+
+const FF = {
+  game1: { team1: { name: 'Duke', region: 'East', seed: 1 }, team2: { name: 'Florida', region: 'South', seed: 1 }, winner: 'Duke', ws: 77, ls: 76 },
+  game2: { team1: { name: 'Arizona', region: 'West', seed: 1 }, team2: { name: 'Michigan', region: 'Midwest', seed: 1 }, winner: 'Michigan', ws: 76, ls: 75 },
+};
+const CHAMP = { winner: 'Duke', loser: 'Michigan', winner_seed: 1, loser_seed: 1, ws: 77, ls: 74 };
+
+// ── Tab Switching ──────────────────────────────────────────────────────────
+function switchTab(name, btn, mobile) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (mobile) {
+    const mb = document.getElementById('mobileBtn-' + mobile);
+    if (mb) mb.classList.add('active');
+  }
+}
+
+// ── Range inputs ───────────────────────────────────────────────────────────
+function updateRange(id) {
+  const val = parseFloat(document.getElementById(id).value);
+  const label = document.getElementById(id + '_val');
+  if (label) label.textContent = val.toFixed(1);
+  // Auto-calc barthag
+  if (id === 'teamAAdjO' || id === 'teamAAdjD') calcBarthag('A');
+  if (id === 'teamBAdjO' || id === 'teamBAdjD') calcBarthag('B');
+}
+
+function calcBarthag(team) {
+  const o = parseFloat(document.getElementById('team' + team + 'AdjO').value);
+  const d = parseFloat(document.getElementById('team' + team + 'AdjD').value);
+  // Simplified barthag estimate
+  const barthag = Math.max(0.01, Math.min(0.99, (o - d) / 30 + 0.5));
+  document.getElementById('team' + team + 'Barthag').value = barthag.toFixed(3);
+}
+
+// ── Player out toggle ──────────────────────────────────────────────────────
+document.getElementById('teamAPlayerOut').addEventListener('change', function() {
+  document.getElementById('teamAPlayerOutDetail').style.display = this.checked ? 'block' : 'none';
+});
+document.getElementById('teamBPlayerOut').addEventListener('change', function() {
+  document.getElementById('teamBPlayerOutDetail').style.display = this.checked ? 'block' : 'none';
+});
+
+// ── Round selector ─────────────────────────────────────────────────────────
+function setRound(round, btn) {
+  currentRound = round;
+  document.querySelectorAll('.btn-sim-count').forEach(b => {
+    if (['R64','R32','S16','E8','FF','Champ'].some(r => b.textContent.includes(r))) {
+      b.classList.remove('active');
+    }
+  });
+  if (btn) btn.classList.add('active');
+}
+
+// ── Sim count ──────────────────────────────────────────────────────────────
+function setSimCount(n, btn) {
+  simCount = n;
+  document.querySelectorAll('[onclick^="setSimCount"]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const times = { 1000: '~5 seconds', 10000: '~30-40 seconds', 49999: '~2-3 minutes' };
+  document.getElementById('simTimeEst').textContent = (times[n] || '') + ' estimated';
+}
+
+// ── Auto-fill team from Torvik data ───────────────────────────────────────
+const TORVIK_CACHE = {};
+async function autoFillTeam(side) {
+  // Could fetch from /api/teams — for now it's a UX placeholder
+}
+
+// ── Game Simulation ────────────────────────────────────────────────────────
+async function runGameSim() {
+  const btn = document.getElementById('simGameBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Simulating...';
+
+  const teamA = {
+    name: document.getElementById('teamAName').value || 'Team A',
+    seed: parseInt(document.getElementById('teamASeed').value) || 1,
+    conf: document.getElementById('teamAConf').value,
+    adj_o: parseFloat(document.getElementById('teamAAdjO').value),
+    adj_d: parseFloat(document.getElementById('teamAAdjD').value),
+    barthag: parseFloat(document.getElementById('teamABarthag').value),
+    adj_t: 68, sos: parseFloat(document.getElementById('teamASOS').value), wab: 3,
+  };
+  const teamB = {
+    name: document.getElementById('teamBName').value || 'Team B',
+    seed: parseInt(document.getElementById('teamBSeed').value) || 1,
+    conf: document.getElementById('teamBConf').value,
+    adj_o: parseFloat(document.getElementById('teamBAdjO').value),
+    adj_d: parseFloat(document.getElementById('teamBAdjD').value),
+    barthag: parseFloat(document.getElementById('teamBBarthag').value),
+    adj_t: 68, sos: parseFloat(document.getElementById('teamBSOS').value), wab: 3,
+  };
+
+  const aOut = document.getElementById('teamAPlayerOut').checked;
+  const bOut = document.getElementById('teamBPlayerOut').checked;
+
+  try {
+    const res = await fetch('/api/predict_game', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        team_a: teamA, team_b: teamB, round: currentRound,
+        team_a_adj_o_mod: aOut ? parseFloat(document.getElementById('teamAAdjOMod').value) : 0,
+        team_b_adj_o_mod: bOut ? parseFloat(document.getElementById('teamBAdjOMod').value) : 0,
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showGameResults(data, teamA, teamB);
+  } catch(e) {
+    alert('Simulation error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Run Simulation';
+  }
+}
+
+function showGameResults(data, teamA, teamB) {
+  const results = document.getElementById('gameResults');
+  results.style.display = 'block';
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const winner = data.winner;
+  const isA = winner === teamA.name;
+  const wScore = isA ? data.score_a : data.score_b;
+  const lScore = isA ? data.score_b : data.score_a;
+  const loser = isA ? teamB.name : teamA.name;
+  const wpA = (data.win_probability_a * 100).toFixed(0);
+  const wpB = (data.win_probability_b * 100).toFixed(0);
+
+  document.getElementById('winnerBanner').innerHTML = `
+    <div>
+      <div style="font-size:11px; opacity:0.7; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.06em;">Winner · ${data.round}</div>
+      <div class="result-winner-name">${winner}</div>
+      <div class="result-winner-sub">def. ${loser} · ${(data.confidence*100).toFixed(0)}% confidence</div>
+    </div>
+    <div>
+      <div class="result-score">${wScore}–${lScore}</div>
+      <div class="result-score-label">Projected score</div>
+    </div>
+  `;
+
+  document.getElementById('probLabelA').textContent = teamA.name;
+  document.getElementById('probLabelB').textContent = teamB.name;
+  document.getElementById('probBarFill').style.width = wpA + '%';
+  document.getElementById('probPctA').textContent = wpA + '%';
+  document.getElementById('probPctB').textContent = wpB + '%';
+
+  const hard = data.pillar_scores?.hard || {};
+  const soft = data.pillar_scores?.soft || {};
+  const chaos = data.pillar_scores?.chaos || {};
+
+  function scoreColor(v) { return v >= 55 ? 'good' : v >= 45 ? 'neutral' : 'bad'; }
+
+  const hardScore = ((hard.team_a_hard || 50));
+  const softScore = ((soft.team_a_soft || 50));
+  const upsetProb = ((chaos.upset_probability || 0.2) * 100).toFixed(0);
+
+  document.getElementById('pillarGrid').innerHTML = `
+    <div class="pillar-card">
+      <div class="pillar-name">📊 Hard Score</div>
+      <div class="pillar-score ${scoreColor(hardScore)}">${hardScore.toFixed(0)}</div>
+      <div class="pillar-desc">AdjOE, AdjDE, Barthag, SOS</div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-name">🔥 Soft Score</div>
+      <div class="pillar-score ${scoreColor(softScore)}">${softScore.toFixed(0)}</div>
+      <div class="pillar-desc">Momentum, coach, roster continuity</div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-name">🎲 Chaos Score</div>
+      <div class="pillar-score neutral">${upsetProb}%</div>
+      <div class="pillar-desc">Upset probability this game</div>
+    </div>
+  `;
+
+  const upsetEl = document.getElementById('upsetIndicator');
+  if (parseFloat(upsetProb) > 30) {
+    upsetEl.innerHTML = `<div class="alert alert-warning">🚨 High upset potential — ${upsetProb}% upset probability in this game</div>`;
+  } else {
+    upsetEl.innerHTML = '';
+  }
+}
+
+// ── Tournament Simulation ─────────────────────────────────────────────────
+async function runTournament() {
+  const btn = document.getElementById('runTournBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Running simulations...';
+
+  const progressWrapper = document.getElementById('progressWrapper');
+  progressWrapper.style.display = 'block';
+  animateProgress(simCount);
+
+  const adjustments = {};
+  if (document.getElementById('adj_bama').checked) {
+    adjustments['Alabama'] = { adj_o_mod: -4.5, barthag_mod: -0.05, enabled: true };
+  }
+
+  try {
+    const res = await fetch('/api/predict_tournament', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ simulations: simCount, player_adjustments: adjustments })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showTournamentResults(data);
+  } catch(e) {
+    alert('Tournament simulation error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🏆 Run Tournament Simulation';
+    progressWrapper.style.display = 'none';
+  }
+}
+
+function animateProgress(total) {
+  let pct = 0;
+  const fill = document.getElementById('progressFill');
+  const pctEl = document.getElementById('progressPct');
+  const textEl = document.getElementById('progressText');
+  const steps = [
+    [10, 'Running Round of 64...'],
+    [25, 'Running Round of 32...'],
+    [45, 'Running Sweet 16...'],
+    [65, 'Running Elite 8...'],
+    [80, 'Running Final Four...'],
+    [92, 'Running Championship...'],
+    [98, 'Aggregating results...'],
+  ];
+  let si = 0;
+
+  const interval = setInterval(() => {
+    if (si < steps.length && pct >= steps[si][0]) {
+      textEl.textContent = steps[si][1];
+      si++;
+    }
+    pct = Math.min(pct + 0.5, 98);
+    fill.style.width = pct + '%';
+    pctEl.textContent = Math.floor(pct) + '%';
+  }, total / 200);
+
+  // Store interval for cleanup
+  window._progressInterval = interval;
+}
+
+function showTournamentResults(data) {
+  clearInterval(window._progressInterval);
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressPct').textContent = '100%';
+
+  document.getElementById('tournResults').style.display = 'block';
+  document.getElementById('simsLabel').textContent = `${data.simulations.toLocaleString()} simulations`;
+
+  tournamentBracketPicks = data.bracket_picks;
+
+  // Champion odds table
+  const tbody = document.getElementById('oddsBody');
+  const colors = ['#6366F1','#6366F1','#6366F1','#6366F1','#7C3AED','#7C3AED','#7C3AED','#7C3AED','#F59E0B','#F59E0B'];
+  const maxTitle = data.champion_odds[0]?.title_pct || 1;
+
+  tbody.innerHTML = data.champion_odds.slice(0, 15).map((t, i) => `
+    <tr>
+      <td class="odds-rank">${i+1}</td>
+      <td>
+        <div class="odds-team">${t.team}</div>
+      </td>
+      <td>
+        <div class="odds-pct" style="color:${colors[i] || '#A1A1AA'}">${t.title_pct}%</div>
+        <div class="odds-bar"><div class="odds-bar-fill" style="width:${(t.title_pct/maxTitle*100).toFixed(0)}%; background:${colors[i] || '#A1A1AA'};"></div></div>
+      </td>
+      <td>
+        <div style="font-size:12px; color:var(--text-2);">${t.final_four_pct}%</div>
+      </td>
+      <td>
+        <div style="font-size:12px; color:var(--text-2);">${t.sweet_16_pct}%</div>
+      </td>
+    </tr>
+  `).join('');
+
+  // Upset watch — scan r64 for high upset prob
+  const allR64 = [];
+  for (const [region, picks] of Object.entries(data.bracket_picks || {})) {
+    for (const game of picks.r64 || []) {
+      if (game.upset || game.upset_prob > 0.30) {
+        allR64.push({ ...game, region });
+      }
+    }
+  }
+
+  const upsetBody = document.getElementById('upsetWatchBody');
+  if (allR64.length === 0) {
+    // Fall back to preloaded upsets
+    upsetBody.innerHTML = `<p style="color:var(--text-3); font-size:13px;">Run simulations to see live upset predictions.</p>`;
+  } else {
+    upsetBody.innerHTML = allR64.map(g => `
+      <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border-light);">
+        <span class="upset-tag">UPSET</span>
+        <div style="flex:1; font-weight:600; font-size:13px;">${g.winner}</div>
+        <div style="font-size:12px; color:var(--text-3);">over ${g.loser}</div>
+        <span style="background:var(--danger-light); color:var(--danger); font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px;">${((g.upset_prob||0)*100).toFixed(0)}%</span>
+      </div>
+    `).join('');
+  }
+}
+
+function applyBracketPicks() {
+  switchTab('bracket', null, 'bracket');
+  // If we have tournament picks, they're already visible as preloaded
+}
+
+// ── Bracket Building ──────────────────────────────────────────────────────
+function buildBracket() {
+  const container = document.getElementById('bracketRegions');
+  container.innerHTML = '';
+
+  const regionColors = { East: '#6366F1', South: '#EF4444', West: '#10B981', Midwest: '#F59E0B' };
+
+  for (const region of ['East', 'South', 'West', 'Midwest']) {
+    const picks = PICKS[region];
+    const bracket2026 = {
+      East: { 1:'Duke',2:'UConn',3:'Michigan St.',4:'Kansas',5:"St. John's",6:'Louisville',7:'UCLA',8:'Ohio St.',9:'TCU',10:'UCF',11:'South Florida',12:'Northern Iowa',13:'Cal Baptist',14:'North Dakota St.',15:'Furman',16:'Siena' },
+      South: { 1:'Florida',2:'Houston',3:'Illinois',4:'Nebraska',5:'Vanderbilt',6:'North Carolina',7:"Saint Mary's",8:'Clemson',9:'Iowa',10:'Texas A&M',11:'VCU',12:'McNeese St.',13:'Troy',14:'Penn',15:'Idaho',16:'Lehigh' },
+      West: { 1:'Arizona',2:'Purdue',3:'Gonzaga',4:'Arkansas',5:'Wisconsin',6:'BYU',7:'Miami FL',8:'Villanova',9:'Utah St.',10:'Missouri',11:'Texas',12:'High Point',13:'Hawaii',14:'Kennesaw St.',15:'Queens',16:'LIU' },
+      Midwest: { 1:'Michigan',2:'Iowa St.',3:'Virginia',4:'Alabama',5:'Texas Tech',6:'Tennessee',7:'Kentucky',8:'Georgia',9:'Saint Louis',10:'Santa Clara',11:'SMU',12:'Akron',13:'Hofstra',14:'Wright St.',15:'Tennessee St.',16:'UMBC' },
+    };
+    const seeds = bracket2026[region];
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'region-wrapper';
+    wrapper.id = 'region-' + region;
+
+    const label = document.createElement('div');
+    label.className = 'region-label';
+    label.innerHTML = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${regionColors[region]}; margin-right:6px;"></span>${region} Region`;
+    wrapper.appendChild(label);
+
+    const regionDiv = document.createElement('div');
+    regionDiv.className = 'bracket-region';
+
+    // R64
+    const r64div = document.createElement('div');
+    r64div.className = 'bracket-round';
+    r64div.innerHTML = '<div class="round-header">Round of 64</div>';
+    const r64matchups = [
+      [1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]
+    ];
+    picks.r64.forEach((pick, i) => {
+      const [sa, sb] = r64matchups[i];
+      const ta = seeds[sa], tb = seeds[sb];
+      r64div.appendChild(buildMatchup(ta, sa, tb, sb, pick, pick.winner === ta ? pick.ws : pick.ls, pick.winner === ta ? pick.ls : pick.ws, region, 'r64', i));
+    });
+    regionDiv.appendChild(r64div);
+
+    // R32
+    const r32div = document.createElement('div');
+    r32div.className = 'bracket-round';
+    r32div.innerHTML = '<div class="round-header">Round of 32</div>';
+    picks.r32.forEach((pick, i) => {
+      r32div.appendChild(buildMatchup(pick.winner, pick.ws_seed, pick.loser, pick.ls_seed, pick, pick.ws, pick.ls, region, 'r32', i));
+    });
+    regionDiv.appendChild(r32div);
+
+    // S16
+    const s16div = document.createElement('div');
+    s16div.className = 'bracket-round';
+    s16div.innerHTML = '<div class="round-header">Sweet 16</div>';
+    picks.s16.forEach((pick, i) => {
+      s16div.appendChild(buildMatchup(pick.winner, pick.ws_seed, pick.loser, pick.ls_seed, pick, pick.ws, pick.ls, region, 's16', i));
+    });
+    regionDiv.appendChild(s16div);
+
+    // E8
+    const e8div = document.createElement('div');
+    e8div.className = 'bracket-round';
+    e8div.innerHTML = '<div class="round-header">Elite 8</div>';
+    const e8 = picks.e8;
+    e8div.appendChild(buildMatchup(e8.winner, e8.ws_seed, e8.loser, e8.ls_seed, e8, e8.ws, e8.ls, region, 'e8', 0));
+    regionDiv.appendChild(e8div);
+
+    // Region champ
+    const champDiv = document.createElement('div');
+    champDiv.className = 'bracket-round';
+    champDiv.innerHTML = `<div class="round-header">Region Champ</div>`;
+    const champCard = document.createElement('div');
+    champCard.style.cssText = `background:${regionColors[region]}15; border:1px solid ${regionColors[region]}40; border-radius:10px; padding:14px 10px; text-align:center; flex:1;`;
+    champCard.innerHTML = `
+      <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:${regionColors[region]}; margin-bottom:6px;">✅ Region Champion</div>
+      <div style="font-weight:700; font-size:13px; color:var(--text);">${e8.winner}</div>
+      <div style="font-size:10px; color:var(--text-3); margin-top:4px;">${e8.ws}–${e8.ls}</div>
+    `;
+    champDiv.appendChild(champCard);
+    regionDiv.appendChild(champDiv);
+
+    wrapper.appendChild(regionDiv);
+    container.appendChild(wrapper);
+  }
+
+  buildFinalFour();
+  buildChampion();
+}
+
+function buildMatchup(teamA, seedA, teamB, seedB, pick, wsA, wsB, region, round, idx) {
+  const el = document.createElement('div');
+  el.className = 'matchup';
+  const aIsWinner = (typeof teamA === 'string' ? teamA : teamA) === pick.winner;
+
+  const slotA = document.createElement('div');
+  slotA.className = 'team-slot' + (aIsWinner ? ' winner' : ' loser');
+  slotA.innerHTML = `
+    <span class="seed-badge">${seedA}</span>
+    <span class="team-name">${teamA}</span>
+    ${aIsWinner && pick.upset ? '<span class="upset-tag">UPSET</span>' : ''}
+    ${(teamA === 'Alabama' || teamA === 'Alabama (no Holloway)') ? '<span class="alert-tag">⚠️</span>' : ''}
+    <span class="team-score">${aIsWinner ? wsA : wsB}</span>
+  `;
+
+  const slotB = document.createElement('div');
+  slotB.className = 'team-slot' + (!aIsWinner ? ' winner' : ' loser');
+  slotB.innerHTML = `
+    <span class="seed-badge">${seedB}</span>
+    <span class="team-name">${teamB}</span>
+    ${!aIsWinner && pick.upset ? '<span class="upset-tag">UPSET</span>' : ''}
+    ${(teamB === 'Alabama' || (pick.alert && !aIsWinner)) ? '<span class="alert-tag">⚠️</span>' : ''}
+    <span class="team-score">${!aIsWinner ? wsA : wsB}</span>
+  `;
+
+  el.appendChild(slotA);
+  el.appendChild(slotB);
+  el.addEventListener('click', () => showGamePanel(teamA, teamB, pick, region, round));
+  return el;
+}
+
+function buildFinalFour() {
+  const grid = document.getElementById('finalFourGrid');
+  grid.innerHTML = `
+    <div class="ff-matchup-card">
+      <div class="ff-matchup-label">🔵 East vs 🔴 South</div>
+      ${buildFFTeam(FF.game1.team1, FF.game1.winner)}
+      ${buildFFTeam(FF.game1.team2, FF.game1.winner)}
+      <div style="font-size:11px; color:var(--text-3); margin-top:8px; text-align:center;">
+        → <strong>${FF.game1.winner}</strong> ${FF.game1.ws}–${FF.game1.ls}
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
+      <div style="font-size:28px;">🏀</div>
+      <div style="font-size:11px; color:var(--text-3); text-align:center; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">Final<br>Four</div>
+    </div>
+    <div class="ff-matchup-card">
+      <div class="ff-matchup-label">🟡 West vs 🟢 Midwest</div>
+      ${buildFFTeam(FF.game2.team1, FF.game2.winner)}
+      ${buildFFTeam(FF.game2.team2, FF.game2.winner)}
+      <div style="font-size:11px; color:var(--text-3); margin-top:8px; text-align:center;">
+        → <strong>${FF.game2.winner}</strong> ${FF.game2.ws}–${FF.game2.ls}
+      </div>
+    </div>
+  `;
+}
+
+function buildFFTeam(team, winner) {
+  const isWinner = team.name === winner;
+  return `
+    <div class="ff-team ${isWinner ? 'winner' : 'loser'}">
+      <span class="ff-team-seed">${team.seed}</span>
+      <span class="ff-team-name">${team.name}</span>
+      <span style="font-size:10px; color:var(--text-3);">${team.region}</span>
+    </div>
+  `;
+}
+
+function buildChampion() {
+  document.getElementById('championSlot').innerHTML = `
+    <div class="champion-slot">
+      <div class="champion-trophy">🏆</div>
+      <div class="champion-label">2026 National Champion</div>
+      <div class="champion-name">${CHAMP.winner}</div>
+      <div class="champion-score">${CHAMP.ws}–${CHAMP.ls} over ${CHAMP.loser}</div>
+      <div style="margin-top:12px; font-size:11px; color:#92400E; background:#FEF3C7; border-radius:6px; padding:6px 10px;">
+        ⚡ 49,999 simulations · Duke 17.1% champion odds
+      </div>
+    </div>
+  `;
+}
+
+// ── Game Panel ─────────────────────────────────────────────────────────────
+function showGamePanel(teamA, teamB, pick, region, round) {
+  const title = `${typeof teamA === 'string' ? teamA : teamA} vs ${typeof teamB === 'string' ? teamB : teamB}`;
+  document.getElementById('gamePanelTitle').textContent = title;
+
+  const upsetPct = ((pick.upset_prob || 0.2) * 100).toFixed(0);
+  const wpA = pick.upset ? 100 - parseInt(upsetPct) : parseInt(upsetPct) > 35 ? 55 : 65;
+
+  document.getElementById('gamePanelBody').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">${region} · ${round.toUpperCase()}</div>
+      <div style="background:var(--primary); color:white; border-radius:10px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:11px; opacity:0.75; margin-bottom:2px;">Winner</div>
+          <div style="font-size:18px; font-weight:700;">${pick.winner}</div>
+        </div>
+        <div style="text-align:right; font-family:var(--mono); font-size:20px; font-weight:700;">${pick.ws}–${pick.ls}</div>
+      </div>
+    </div>
+
+    ${pick.upset ? `<div class="alert alert-warning">🚨 Upset pick — lower seed wins</div>` : ''}
+    ${pick.alert ? `<div class="alert alert-warning">⚠️ Alabama playing without Aden Holloway (suspended)</div>` : ''}
+
+    <div style="margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:6px;">
+        <span>${typeof teamA === 'string' ? teamA : teamA}</span>
+        <span>${typeof teamB === 'string' ? teamB : teamB}</span>
+      </div>
+      <div style="height:8px; background:#E0E7FF; border-radius:99px; overflow:hidden;">
+        <div style="height:100%; width:${wpA}%; background:var(--primary); border-radius:99px;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-3); margin-top:4px;">
+        <span>${wpA}% win prob</span>
+        <span>${100-wpA}% win prob</span>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px;">
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-3); margin-bottom:6px;">Hard Score</div>
+        <div style="font-size:22px; font-weight:700; color:var(--success);">55%</div>
+        <div style="font-size:10px; color:var(--text-3);">Analytics edge</div>
+      </div>
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-3); margin-bottom:6px;">Soft Score</div>
+        <div style="font-size:22px; font-weight:700; color:var(--warning);">25%</div>
+        <div style="font-size:10px; color:var(--text-3);">Momentum factor</div>
+      </div>
+      <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-3); margin-bottom:6px;">Chaos</div>
+        <div style="font-size:22px; font-weight:700; color:var(--danger);">${upsetPct}%</div>
+        <div style="font-size:10px; color:var(--text-3);">Upset chance</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;" onclick="loadGameIntoSimulator('${typeof teamA === 'string' ? teamA : ''}', '${typeof teamB === 'string' ? teamB : ''}')">
+      ⚡ Simulate This Matchup
+    </button>
+  `;
+
+  document.getElementById('gamePanel').classList.add('open');
+  document.getElementById('panelOverlay').classList.add('visible');
+}
+
+function closeGamePanel() {
+  document.getElementById('gamePanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('visible');
+}
+
+function loadGameIntoSimulator(teamA, teamB) {
+  closeGamePanel();
+  document.getElementById('teamAName').value = teamA;
+  document.getElementById('teamBName').value = teamB;
+  switchTab('simulate', document.querySelector('.tab-btn:nth-child(2)'));
+}
+
+// ── Region filter ──────────────────────────────────────────────────────────
+function filterRegion(region, btn) {
+  document.querySelectorAll('.region-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.region-wrapper').forEach(w => {
+    if (region === 'all') {
+      w.style.display = 'flex';
+    } else {
+      w.style.display = w.id === 'region-' + region ? 'flex' : 'none';
+    }
+  });
+}
+
+// ── Chat ────────────────────────────────────────────────────────────────────
+let chatHistory = [];
+let chatLoading = false;
+
+function sendSuggestion(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  document.getElementById('chatSuggestions').style.display = 'none';
+  sendChat();
+}
+
+async function sendChat() {
+  if (chatLoading) return;
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = '42px';
+  chatLoading = true;
+
+  const btn = document.getElementById('chatSendBtn');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  // Add user message
+  addChatMessage('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  // Typing indicator
+  const typingId = addTypingIndicator();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory.slice(-10) })
+    });
+    const data = await res.json();
+    removeTypingIndicator(typingId);
+
+    const reply = data.reply || data.error || 'Something went wrong.';
+    addChatMessage('assistant', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    removeTypingIndicator(typingId);
+    addChatMessage('assistant', 'Network error — make sure the server is running.');
+  } finally {
+    chatLoading = false;
+    btn.disabled = false;
+    btn.textContent = 'Send';
+  }
+}
+
+function addChatMessage(role, content) {
+  const messages = document.getElementById('chatMessages');
+  const isUser = role === 'user';
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = `display:flex; gap:10px; align-items:flex-start; ${isUser ? 'flex-direction:row-reverse;' : ''}`;
+
+  const avatar = document.createElement('div');
+  avatar.style.cssText = `width:32px; height:32px; border-radius:8px; background:${isUser ? '#E4E4E7' : 'var(--primary)'}; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;`;
+  avatar.textContent = isUser ? '👤' : '🏀';
+
+  const bubble = document.createElement('div');
+  bubble.style.cssText = `background:${isUser ? 'var(--primary)' : 'var(--bg)'}; border:1px solid ${isUser ? 'var(--primary)' : 'var(--border)'}; border-radius:12px; border-${isUser ? 'top-right' : 'top-left'}-radius:4px; padding:12px 14px; max-width:85%;`;
+
+  // Render markdown-lite (bold, line breaks)
+  const formatted = content
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+
+  bubble.innerHTML = `<div style="font-size:13px; line-height:1.5; color:${isUser ? 'white' : 'var(--text)'};">${formatted}</div>`;
+
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(bubble);
+  messages.appendChild(wrapper);
+  messages.scrollTop = messages.scrollHeight;
+  return wrapper;
+}
+
+function addTypingIndicator() {
+  const messages = document.getElementById('chatMessages');
+  const id = 'typing-' + Date.now();
+  const el = document.createElement('div');
+  el.id = id;
+  el.style.cssText = 'display:flex; gap:10px; align-items:flex-start;';
+  el.innerHTML = `
+    <div style="width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">🏀</div>
+    <div style="background:var(--bg); border:1px solid var(--border); border-radius:12px; border-top-left-radius:4px; padding:12px 16px;">
+      <div style="display:flex; gap:4px; align-items:center;">
+        <span style="width:6px; height:6px; border-radius:50%; background:var(--text-3); animation:pulse 1s infinite;"></span>
+        <span style="width:6px; height:6px; border-radius:50%; background:var(--text-3); animation:pulse 1s 0.2s infinite;"></span>
+        <span style="width:6px; height:6px; border-radius:50%; background:var(--text-3); animation:pulse 1s 0.4s infinite;"></span>
+      </div>
+    </div>
+  `;
+  messages.appendChild(el);
+  messages.scrollTop = messages.scrollHeight;
+  return id;
+}
+
+function removeTypingIndicator(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Init range displays
+  ['teamAAdjO','teamAAdjD','teamASOS','teamBAdjO','teamBAdjD','teamBSOS','teamAAdjOMod','teamBAdjOMod'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const label = document.getElementById(id + '_val');
+      if (label) label.textContent = parseFloat(el.value).toFixed(1);
+    }
+  });
+
+  buildBracket();
+});
+</script>
+</body>
+</html>
