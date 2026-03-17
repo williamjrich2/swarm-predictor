@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Swarm Predictor — NCAA 2026</title>
+<title>Swarm Predictor — 2026 NCAA Tournament Bracket Simulator</title>
+<meta name="description" content="AI-powered NCAA tournament bracket predictions. Monte Carlo simulations, head-to-head matchup analysis, and interactive bracket builder for March Madness 2026.">
+<meta property="og:title" content="Swarm Predictor — NCAA Bracket Simulator">
+<meta property="og:description" content="AI-powered bracket predictions with 50,000 Monte Carlo simulations. Build your perfect March Madness bracket.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://swarm.anovagrowth.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -43,6 +48,8 @@
     min-height: 100vh;
     font-size: 14px;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* ── Header ── */
@@ -71,7 +78,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
   }
   .logo-text { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
   .logo-sub { font-size: 11px; color: var(--text-3); font-weight: 400; }
@@ -1021,6 +1030,29 @@
     font-family: var(--mono);
     z-index: 1;
   }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #18181B;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 300ms ease;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .toast.visible {
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.error {
+    background: #DC2626;
+  }
+  .mobile-nav-icon { display: flex; align-items: center; justify-content: center; }
+  .mobile-nav-icon svg { display: block; }
 </style>
 </head>
 <body>
@@ -1028,7 +1060,7 @@
 <!-- Header -->
 <header class="header">
   <div class="header-logo">
-    <div class="logo-icon">🏀</div>
+    <div class="logo-icon">SP</div>
     <div>
       <div class="logo-text">Swarm Predictor</div>
       <div class="logo-sub">NCAA 2026 · Monte Carlo</div>
@@ -1040,19 +1072,19 @@
 <!-- Desktop Tab Nav -->
 <nav class="tab-nav">
   <button class="tab-btn active" onclick="switchTab('bracket', this)">
-    📋 Bracket
+    Bracket
   </button>
   <button class="tab-btn" onclick="switchTab('builder', this)">
-    🏗️ Bracket Builder
+    Bracket Builder
   </button>
   <button class="tab-btn" onclick="switchTab('simulate', this)">
-    ⚡ Head-to-Head
+    Head-to-Head
   </button>
   <button class="tab-btn" onclick="switchTab('tournament', this)">
-    🏆 Tournament Run
+    Tournament
   </button>
   <button class="tab-btn" onclick="switchTab('chat', this)">
-    💬 Swarm AI
+    AI Chat
   </button>
 </nav>
 
@@ -1067,7 +1099,7 @@
         <p style="font-size:12px; color:var(--text-3); margin-top:2px;">Click any matchup to see detailed pillar scores</p>
       </div>
       <div class="alert alert-warning" style="margin:0; padding:8px 12px;">
-        ⚠️ Alabama's Aden Holloway suspended — picks adjusted
+        Alabama — Aden Holloway suspended — picks adjusted
       </div>
     </div>
 
@@ -1178,7 +1210,7 @@
         </div>
 
         <button class="btn btn-primary btn-lg" id="simGameBtn" onclick="runGameSim()">
-          ⚡ Run Head-to-Head Prediction
+          Run Prediction
         </button>
 
         <div style="margin-top:10px; font-size:11px; color:var(--text-3); text-align:center;">
@@ -1190,7 +1222,7 @@
     <!-- Quick matchups section -->
     <div class="card" style="margin-bottom:16px;">
       <div class="card-header">
-        <span class="card-title">🔥 Popular Matchups</span>
+        <span class="card-title">Popular Matchups</span>
         <span style="font-size:11px; color:var(--text-3);">One-click simulate</span>
       </div>
       <div class="card-body" style="padding:12px;">
@@ -1236,16 +1268,16 @@
         <div class="form-group">
           <label class="form-label">Number of Simulations</label>
           <div class="sim-count-row">
-            <button class="btn-sim-count active" onclick="setSimCount(1, this)">1 <span style="font-size:9px;display:block;color:var(--success)">FREE</span></button>
-            <button class="btn-sim-count" onclick="setSimCount(5000, this)" id="btn5k">5,000 <span style="font-size:9px;display:block;color:var(--primary)">$9.99</span></button>
-            <button class="btn-sim-count" onclick="setSimCount(49999, this)" id="btnUnlimited">49,999 <span style="font-size:9px;display:block;color:var(--gold)">$19.99</span></button>
+            <button class="btn-sim-count active" onclick="setSimCount(1, this)">1</button>
+            <button class="btn-sim-count" onclick="setSimCount(5000, this)" id="btn5k">5,000 <span style="font-size:9px;display:block;color:var(--primary)">&mdash; $9.99</span></button>
+            <button class="btn-sim-count" onclick="setSimCount(50000, this)" id="btnUnlimited">50,000 <span style="font-size:9px;display:block;color:var(--gold)">&mdash; $19.99</span></button>
           </div>
           <p style="font-size:11px; color:var(--text-3); margin-top:6px;" id="simTimeEst">Free: 1 simulation · Upgrade for bulk runs</p>
         </div>
 
         <div class="adjustments-section">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <span style="font-size:12px; font-weight:600; color:#92400E;">⚠️ Player Adjustments</span>
+            <span style="font-size:12px; font-weight:600; color:#92400E;">Player Adjustments</span>
             <span style="font-size:11px; color:#B45309;">Active adjustments affect sim results</span>
           </div>
           <div class="adj-row">
@@ -1266,7 +1298,7 @@
         </div>
 
         <button class="btn btn-primary btn-lg" style="margin-top:16px;" id="runTournBtn" onclick="runTournament()">
-          🏆 Run Tournament Simulation
+          Run Tournament
         </button>
       </div>
     </div>
@@ -1274,7 +1306,7 @@
     <div id="tournResults" style="display:none;">
       <div class="card" style="margin-bottom:16px;">
         <div class="card-header">
-          <span class="card-title">🏆 Champion Probability Odds</span>
+          <span class="card-title">Champion Probability</span>
           <span id="simsLabel" style="font-size:11px; color:var(--text-3); display:none;"></span>
         </div>
         <div class="card-body" style="padding:0;">
@@ -1294,11 +1326,11 @@
       </div>
 
       <button class="btn btn-primary" onclick="applyBracketPicks()" style="margin-bottom:16px;">
-        📋 View Most Likely Bracket →
+        View Most Likely Bracket &rarr;
       </button>
 
       <div class="card" style="margin-bottom:16px;">
-        <div class="card-header"><span class="card-title">🚨 Upset Watch (R64)</span></div>
+        <div class="card-header"><span class="card-title">Upset Watch &mdash; Round of 64</span></div>
         <div class="card-body" id="upsetWatchBody"></div>
       </div>
     </div>
@@ -1309,19 +1341,19 @@
 <!-- Mobile Nav -->
 <nav class="mobile-nav">
   <button class="mobile-nav-btn active" id="mobileBtn-bracket" onclick="switchTab('bracket', null, 'bracket')">
-    <span class="mobile-nav-icon">📋</span>Bracket
+    <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg></span>Bracket
   </button>
   <button class="mobile-nav-btn" id="mobileBtn-builder" onclick="switchTab('builder', null, 'builder')">
-    <span class="mobile-nav-icon">🏗️</span>Builder
+    <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span>Builder
   </button>
   <button class="mobile-nav-btn" id="mobileBtn-simulate" onclick="switchTab('simulate', null, 'simulate')">
-    <span class="mobile-nav-icon">⚡</span>Head-to-Head
+    <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>Head-to-Head
   </button>
   <button class="mobile-nav-btn" id="mobileBtn-tournament" onclick="switchTab('tournament', null, 'tournament')">
-    <span class="mobile-nav-icon">🏆</span>Tournament
+    <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 22V12M14 22V12M8 9h8a4 4 0 01-8 0z"/></svg></span>Tournament
   </button>
   <button class="mobile-nav-btn" id="mobileBtn-chat" onclick="switchTab('chat', null, 'chat')">
-    <span class="mobile-nav-icon">💬</span>AI Chat
+    <span class="mobile-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>AI Chat
   </button>
 </nav>
 
@@ -1329,7 +1361,7 @@
   <div id="tab-chat" class="tab-content">
     <div style="max-width:680px; margin:0 auto;">
       <div style="margin-bottom:20px;">
-        <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">💬 Swarm AI — NCAA Analyst</h2>
+        <h2 style="font-size:16px; font-weight:700; margin-bottom:4px;">Swarm AI — NCAA Analyst</h2>
         <p style="font-size:12px; color:var(--text-3);">Ask anything about the bracket, odds, upsets, or player situations</p>
       </div>
 
@@ -1339,10 +1371,10 @@
           <div id="chatMessages" style="height:420px; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px;">
             <!-- Welcome message -->
             <div style="display:flex; gap:10px; align-items:flex-start;">
-              <div style="width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">🏀</div>
+              <div style="width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:white; flex-shrink:0;">SP</div>
               <div style="background:var(--bg); border:1px solid var(--border); border-radius:12px; border-top-left-radius:4px; padding:12px 14px; max-width:85%;">
                 <div style="font-size:13px; line-height:1.5; color:var(--text);">Hey! I'm <strong>Swarm</strong>, your NCAA tournament analyst. I've run <strong>49,999 Monte Carlo simulations</strong> of the 2026 bracket.<br><br>Ask me about any team's odds, upset picks, the <strong>Holloway situation</strong>, or why our model picks Duke to win it all. What do you want to know?</div>
-                <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Swarm AI · Powered by OpenRouter</div>
+                <div style="font-size:10px; color:var(--text-3); margin-top:6px;">Swarm AI</div>
               </div>
             </div>
           </div>
@@ -1368,7 +1400,7 @@
       </div>
 
       <div style="font-size:11px; color:var(--text-3); text-align:center;">
-        Powered by <strong>DeepSeek R1</strong> via OpenRouter (free tier) · NCAA context pre-loaded
+        Powered by Swarm AI
       </div>
     </div>
   </div>
@@ -1378,7 +1410,7 @@
 <div class="game-panel" id="gamePanel">
   <div class="game-panel-header">
     <span class="game-panel-title" id="gamePanelTitle">Game Details</span>
-    <button class="game-panel-close" onclick="closeGamePanel()">✕</button>
+    <button class="game-panel-close" onclick="closeGamePanel()">&times;</button>
   </div>
   <div class="game-panel-body" id="gamePanelBody">
     <div style="text-align:center; padding:40px; color:var(--text-3);">
@@ -1391,9 +1423,9 @@
 <!-- Paywall Modal -->
 <div class="paywall-overlay" id="paywallOverlay">
   <div class="paywall-modal">
-    <div style="font-size:36px; margin-bottom:12px;">🔒</div>
-    <h3>You've used your 3 free simulations!</h3>
-    <p>Upgrade to keep simulating matchups with the Swarm prediction engine. Unlock thousands of sims and find every edge.</p>
+    <div style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text-2); text-transform:uppercase; letter-spacing:0.06em;">UPGRADE</div>
+    <h3>Simulation Limit Reached</h3>
+    <p>You've used your 1,000 free predictions. Upgrade for more simulations and tournament analysis.</p>
     <div class="paywall-buttons">
       <a class="paywall-btn paywall-btn-primary" id="paywallBtn5k" href="#" target="_blank">$9.99 — 5K Sim Pack</a>
       <a class="paywall-btn paywall-btn-gold" id="paywallBtnUnlimited" href="#" target="_blank">$19.99 — Unlimited</a>
@@ -1409,6 +1441,24 @@ let simCount = 1;
 let bracketData = null;
 let tournamentBracketPicks = null;
 
+// ── Toast notifications ───────────────────────────────────────────────────
+function showToast(msg, type, duration) {
+  type = type || 'info';
+  duration = duration || 3000;
+  var toast = document.getElementById('globalToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'globalToast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.className = 'toast' + (type === 'error' ? ' error' : '');
+  requestAnimationFrame(function() { toast.classList.add('visible'); });
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function() { toast.classList.remove('visible'); }, duration);
+}
+
 // ── Sim counting & paywall ────────────────────────────────────────────────
 function getSimsUsed() {
   return parseInt(localStorage.getItem('swarm_sims_used') || '0', 10);
@@ -1421,7 +1471,7 @@ function incrementSimsUsed() {
 function canRunSim() {
   const tier = getUserTier();
   if (tier === '5k' || tier === 'unlimited') return true;
-  return getSimsUsed() < 3;
+  return getSimsUsed() < 1000;
 }
 function showPaywall() {
   document.getElementById('paywallBtn5k').href = STRIPE_5K;
@@ -1708,7 +1758,7 @@ function setSimCount(n, btn) {
     return;
   }
   if (n > 5000 && tier !== 'unlimited') {
-    if (confirm('49,999 simulations requires the $19.99 Unlimited plan.\n\nOpen payment page?')) {
+    if (confirm('50,000 simulations requires the $19.99 Unlimited plan.\n\nOpen payment page?')) {
       window.open(STRIPE_UNLIMITED, '_blank');
     }
     return;
@@ -1716,7 +1766,7 @@ function setSimCount(n, btn) {
   simCount = n;
   document.querySelectorAll('[onclick^="setSimCount"]').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  const times = { 1: 'Instant', 5000: '~30 seconds', 49999: '~2-3 minutes' };
+  const times = { 1: 'Instant', 5000: '~30 seconds', 50000: '~2-3 minutes' };
   document.getElementById('simTimeEst').textContent = (times[n] || '') + ' estimated';
 }
 
@@ -1745,8 +1795,8 @@ async function runGameSim() {
   const nameA = document.getElementById('h2hTeamA').value;
   const nameB = document.getElementById('h2hTeamB').value;
 
-  if (!nameA || !nameB) { alert('Pick two teams first!'); btn.disabled = false; btn.innerHTML = '⚡ Run Head-to-Head Prediction'; return; }
-  if (nameA === nameB) { alert('Pick two different teams!'); btn.disabled = false; btn.innerHTML = '⚡ Run Head-to-Head Prediction'; return; }
+  if (!nameA || !nameB) { showToast('Select two teams to run a prediction', 'error'); btn.disabled = false; btn.innerHTML = 'Run Prediction'; return; }
+  if (nameA === nameB) { showToast('Select two different teams', 'error'); btn.disabled = false; btn.innerHTML = 'Run Prediction'; return; }
 
   const teamA = TEAM_DATABASE[nameA];
   const teamB = TEAM_DATABASE[nameB];
@@ -1776,16 +1826,11 @@ async function runGameSim() {
     localStorage.setItem('swarm_matchup_runs', JSON.stringify(runs));
 
     showGameResults(data, { name: nameA, seed: teamA.seed }, { name: nameB, seed: teamB.seed });
-
-    // Check if paywall needed after sim
-    if (getUserTier() === 'free' && used >= 3) {
-      setTimeout(() => showPaywall(), 1500);
-    }
   } catch(e) {
-    alert('Simulation error: ' + e.message);
+    showToast('Prediction failed — try again', 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '⚡ Run Head-to-Head Prediction';
+    btn.innerHTML = 'Run Prediction';
   }
 }
 
@@ -1832,17 +1877,17 @@ function showGameResults(data, teamA, teamB) {
 
   document.getElementById('pillarGrid').innerHTML = `
     <div class="pillar-card">
-      <div class="pillar-name">📊 Hard Score</div>
+      <div class="pillar-name">Hard Score</div>
       <div class="pillar-score ${scoreColor(hardScore)}">${hardScore.toFixed(0)}</div>
       <div class="pillar-desc">AdjOE, AdjDE, Barthag, SOS</div>
     </div>
     <div class="pillar-card">
-      <div class="pillar-name">🔥 Soft Score</div>
+      <div class="pillar-name">Soft Score</div>
       <div class="pillar-score ${scoreColor(softScore)}">${softScore.toFixed(0)}</div>
       <div class="pillar-desc">Momentum, coach, roster continuity</div>
     </div>
     <div class="pillar-card">
-      <div class="pillar-name">🎲 Chaos Score</div>
+      <div class="pillar-name">Chaos Score</div>
       <div class="pillar-score neutral">${upsetProb}%</div>
       <div class="pillar-desc">Upset probability this game</div>
     </div>
@@ -1850,7 +1895,7 @@ function showGameResults(data, teamA, teamB) {
 
   const upsetEl = document.getElementById('upsetIndicator');
   if (parseFloat(upsetProb) > 30) {
-    upsetEl.innerHTML = `<div class="alert alert-warning">🚨 High upset potential — ${upsetProb}% upset probability in this game</div>`;
+    upsetEl.innerHTML = `<div class="alert alert-warning">High upset potential — ${upsetProb}% upset probability in this game</div>`;
   } else {
     upsetEl.innerHTML = '';
   }
@@ -1881,10 +1926,10 @@ async function runTournament() {
     if (data.error) throw new Error(data.error);
     showTournamentResults(data);
   } catch(e) {
-    alert('Tournament simulation error: ' + e.message);
+    showToast('Tournament simulation failed — try again', 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '🏆 Run Tournament Simulation';
+    btn.innerHTML = 'Run Tournament';
     progressWrapper.style.display = 'none';
   }
 }
@@ -2054,7 +2099,7 @@ function buildBracket() {
     const champCard = document.createElement('div');
     champCard.style.cssText = `background:${regionColors[region]}15; border:1px solid ${regionColors[region]}40; border-radius:10px; padding:14px 10px; text-align:center; flex:1;`;
     champCard.innerHTML = `
-      <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:${regionColors[region]}; margin-bottom:6px;">✅ Region Champion</div>
+      <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:${regionColors[region]}; margin-bottom:6px;">Region Champion</div>
       <div style="font-weight:700; font-size:13px; color:var(--text);">${e8.winner}</div>
       <div style="font-size:10px; color:var(--text-3); margin-top:4px;">${e8.ws}–${e8.ls}</div>
     `;
@@ -2090,7 +2135,7 @@ function buildMatchup(teamA, seedA, teamB, seedB, pick, wsA, wsB, region, round,
     <span class="seed-badge">${seedA}</span>
     <span class="team-name">${teamA}</span>
     ${aIsWinner && pick.upset ? '<span class="upset-tag">UPSET</span>' : ''}
-    ${(teamA === 'Alabama' || teamA === 'Alabama (no Holloway)') ? '<span class="alert-tag">⚠️</span>' : ''}
+    ${(teamA === 'Alabama' || teamA === 'Alabama (no Holloway)') ? '<span class="alert-tag">ALT</span>' : ''}
     <span class="team-score">${aIsWinner ? wsA : wsB}</span>
   `;
 
@@ -2100,7 +2145,7 @@ function buildMatchup(teamA, seedA, teamB, seedB, pick, wsA, wsB, region, round,
     <span class="seed-badge">${seedB}</span>
     <span class="team-name">${teamB}</span>
     ${!aIsWinner && pick.upset ? '<span class="upset-tag">UPSET</span>' : ''}
-    ${(teamB === 'Alabama' || (pick.alert && !aIsWinner)) ? '<span class="alert-tag">⚠️</span>' : ''}
+    ${(teamB === 'Alabama' || (pick.alert && !aIsWinner)) ? '<span class="alert-tag">ALT</span>' : ''}
     <span class="team-score">${!aIsWinner ? wsA : wsB}</span>
   `;
 
@@ -2114,7 +2159,7 @@ function buildFinalFour() {
   const grid = document.getElementById('finalFourGrid');
   grid.innerHTML = `
     <div class="ff-matchup-card">
-      <div class="ff-matchup-label">🔵 East vs 🔴 South</div>
+      <div class="ff-matchup-label">East vs South</div>
       ${buildFFTeam(FF.game1.team1, FF.game1.winner)}
       ${buildFFTeam(FF.game1.team2, FF.game1.winner)}
       <div style="font-size:11px; color:var(--text-3); margin-top:8px; text-align:center;">
@@ -2122,11 +2167,11 @@ function buildFinalFour() {
       </div>
     </div>
     <div style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
-      <div style="font-size:28px;">🏀</div>
+      <div style="font-size:18px; font-weight:700; color:var(--text-3);">VS</div>
       <div style="font-size:11px; color:var(--text-3); text-align:center; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">Final<br>Four</div>
     </div>
     <div class="ff-matchup-card">
-      <div class="ff-matchup-label">🟡 West vs 🟢 Midwest</div>
+      <div class="ff-matchup-label">West vs Midwest</div>
       ${buildFFTeam(FF.game2.team1, FF.game2.winner)}
       ${buildFFTeam(FF.game2.team2, FF.game2.winner)}
       <div style="font-size:11px; color:var(--text-3); margin-top:8px; text-align:center;">
@@ -2150,7 +2195,7 @@ function buildFFTeam(team, winner) {
 function buildChampion() {
   document.getElementById('championSlot').innerHTML = `
     <div class="champion-slot">
-      <div class="champion-trophy">🏆</div>
+      <div class="champion-trophy" style="font-size:14px; font-weight:700; color:var(--gold); letter-spacing:0.1em;">CHAMPION</div>
       <div class="champion-label">2026 National Champion</div>
       <div class="champion-name">${CHAMP.winner}</div>
       <div class="champion-score">${CHAMP.ws}–${CHAMP.ls} over ${CHAMP.loser}</div>
@@ -2178,8 +2223,8 @@ function showGamePanel(teamA, teamB, pick, region, round) {
       </div>
     </div>
 
-    ${pick.upset ? `<div class="alert alert-warning">🚨 Upset pick — lower seed wins</div>` : ''}
-    ${pick.alert ? `<div class="alert alert-warning">⚠️ Alabama playing without Aden Holloway (suspended)</div>` : ''}
+    ${pick.upset ? `<div class="alert alert-warning">Upset pick — lower seed wins</div>` : ''}
+    ${pick.alert ? `<div class="alert alert-warning">Alabama playing without Aden Holloway (suspended)</div>` : ''}
 
     <div style="margin-bottom:20px;">
       <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:6px;">
@@ -2214,7 +2259,7 @@ function showGamePanel(teamA, teamB, pick, region, round) {
     </div>
 
     <button class="btn btn-primary" style="width:100%;" onclick="loadGameIntoSimulator('${typeof teamA === 'string' ? teamA : ''}', '${typeof teamB === 'string' ? teamB : ''}')">
-      ⚡ Simulate This Matchup
+      Simulate This Matchup
     </button>
   `;
 
@@ -2309,8 +2354,8 @@ function addChatMessage(role, content) {
   wrapper.style.cssText = `display:flex; gap:10px; align-items:flex-start; ${isUser ? 'flex-direction:row-reverse;' : ''}`;
 
   const avatar = document.createElement('div');
-  avatar.style.cssText = `width:32px; height:32px; border-radius:8px; background:${isUser ? '#E4E4E7' : 'var(--primary)'}; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;`;
-  avatar.textContent = isUser ? '👤' : '🏀';
+  avatar.style.cssText = `width:32px; height:32px; border-radius:8px; background:${isUser ? '#E4E4E7' : 'var(--primary)'}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:${isUser ? 'var(--text-2)' : 'white'}; flex-shrink:0;`;
+  avatar.textContent = isUser ? 'You' : 'SP';
 
   const bubble = document.createElement('div');
   bubble.style.cssText = `background:${isUser ? 'var(--primary)' : 'var(--bg)'}; border:1px solid ${isUser ? 'var(--primary)' : 'var(--border)'}; border-radius:12px; border-${isUser ? 'top-right' : 'top-left'}-radius:4px; padding:12px 14px; max-width:85%;`;
@@ -2336,7 +2381,7 @@ function addTypingIndicator() {
   el.id = id;
   el.style.cssText = 'display:flex; gap:10px; align-items:flex-start;';
   el.innerHTML = `
-    <div style="width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">🏀</div>
+    <div style="width:32px; height:32px; border-radius:8px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; flex-shrink:0;">SP</div>
     <div style="background:var(--bg); border:1px solid var(--border); border-radius:12px; border-top-left-radius:4px; padding:12px 16px;">
       <div style="display:flex; gap:4px; align-items:center;">
         <span style="width:6px; height:6px; border-radius:50%; background:var(--text-3); animation:pulse 1s infinite;"></span>
@@ -2590,9 +2635,8 @@ async function bbSimMatchup(region, roundIdx, matchIdx) {
     m.scoreB = data.score_b;
     bbAdvance(region, roundIdx, matchIdx);
     renderBracketBuilder();
-    if (used >= 3 && getUserTier() === 'free') setTimeout(() => showPaywall(), 800);
   } catch(e) {
-    alert('Sim error: ' + e.message);
+    showToast('Simulation error — try again', 'error');
   }
 }
 
@@ -2622,8 +2666,7 @@ async function bbSimFF(ffIdx) {
     if (!bbState._champ) bbState._champ = { teamA: null, teamB: null, winner: null, scoreA: null, scoreB: null };
     bbState._champ[slot] = { name: winnerTeam.name, seed: winnerTeam.seed };
     renderBracketBuilder();
-    if (used >= 3 && getUserTier() === 'free') setTimeout(() => showPaywall(), 800);
-  } catch(e) { alert('Sim error: ' + e.message); }
+  } catch(e) { showToast('Simulation error — try again', 'error'); }
 }
 
 async function bbSimChamp() {
@@ -2648,8 +2691,7 @@ async function bbSimChamp() {
     m.scoreA = data.score_a;
     m.scoreB = data.score_b;
     renderBracketBuilder();
-    if (used >= 3 && getUserTier() === 'free') setTimeout(() => showPaywall(), 800);
-  } catch(e) { alert('Sim error: ' + e.message); }
+  } catch(e) { showToast('Simulation error — try again', 'error'); }
 }
 
 function renderBBMatchup(m, onClickA, onClickB, onSim) {
@@ -2695,7 +2737,7 @@ function renderBBMatchup(m, onClickA, onClickB, onSim) {
   if (m.teamA && m.teamB && m.teamA.name && m.teamB.name) {
     const sb = document.createElement('button');
     sb.className = 'bb-sim-btn';
-    sb.textContent = '\u26A1';
+    sb.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
     sb.title = 'Simulate this matchup';
     sb.addEventListener('click', function(e) { e.stopPropagation(); onSim(); });
     div.appendChild(sb);
@@ -2753,7 +2795,7 @@ function renderBracketBuilder() {
     if (fi === 1) {
       const vs = document.createElement('div');
       vs.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;';
-      vs.innerHTML = '<div style="font-size:24px;">🏀</div><div style="font-size:10px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Final Four</div>';
+      vs.innerHTML = '<div style="font-size:16px;font-weight:700;color:var(--text-3);">VS</div><div style="font-size:10px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Final Four</div>';
       ffGrid.appendChild(vs);
     }
     const m = bbState._ff[fi] || { teamA: null, teamB: null, winner: null, scoreA: null, scoreB: null };
@@ -2796,7 +2838,7 @@ function renderBracketBuilder() {
   const champBox = document.getElementById('bbChampion');
   champBox.innerHTML = '';
   if (cm.winner) {
-    champBox.innerHTML = '<div class="bb-champ-box"><div style="font-size:32px;margin-bottom:8px;">🏆</div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#F59E0B;margin-bottom:8px;">Your Champion</div><div style="font-size:18px;font-weight:700;">' + cm.winner + '</div>' + (cm.scoreA != null ? '<div style="font-size:13px;color:var(--text-2);margin-top:4px;font-family:var(--mono);">' + cm.scoreA + '-' + cm.scoreB + '</div>' : '') + '</div>';
+    champBox.innerHTML = '<div class="bb-champ-box"><div style="font-size:14px;font-weight:700;color:#F59E0B;letter-spacing:0.1em;margin-bottom:8px;">CHAMPION</div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#F59E0B;margin-bottom:8px;">Your Champion</div><div style="font-size:18px;font-weight:700;">' + cm.winner + '</div>' + (cm.scoreA != null ? '<div style="font-size:13px;color:var(--text-2);margin-top:4px;font-family:var(--mono);">' + cm.scoreA + '-' + cm.scoreB + '</div>' : '') + '</div>';
   }
 }
 
