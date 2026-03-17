@@ -9,6 +9,10 @@
 <meta property="og:description" content="AI-powered bracket predictions with 50,000 Monte Carlo simulations. Build your perfect March Madness bracket.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://swarm.anovagrowth.com">
+<meta property="og:image" content="https://swarm.anovagrowth.com/swarm-icon-512.png">
+<link rel="icon" type="image/x-icon" href="/swarm-favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/swarm-favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/swarm-apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -73,14 +77,13 @@
   .logo-icon {
     width: 32px;
     height: 32px;
-    background: var(--primary);
     border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: white;
+    overflow: hidden;
+  }
+  .logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .logo-text { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
   .logo-sub { font-size: 11px; color: var(--text-3); font-weight: 400; }
@@ -1060,7 +1063,7 @@
 <!-- Header -->
 <header class="header">
   <div class="header-logo">
-    <div class="logo-icon">SP</div>
+    <div class="logo-icon"><img src="/swarm-icon-192.png" alt="Swarm Predictor"></div>
     <div>
       <div class="logo-text">Swarm Predictor</div>
       <div class="logo-sub">NCAA 2026 · Monte Carlo</div>
@@ -1746,8 +1749,18 @@ const STRIPE_UNLIMITED = 'https://buy.stripe.com/eVqeVef4j4TA0uC9W92wU0d';
 
 function getUserTier() {
   const t = localStorage.getItem('swarm_tier');
-  return t === 'unlimited' ? 'unlimited' : t === '5k' ? '5k' : 'free';
+  if (t === 'unlimited' || t === 'admin') return 'unlimited';
+  return t === '5k' ? '5k' : 'free';
 }
+
+// Admin access via URL param: ?admin=swarm2026
+(function checkAdmin() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('admin') === 'swarm2026') {
+    localStorage.setItem('swarm_tier', 'admin');
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
 
 function setSimCount(n, btn) {
   const tier = getUserTier();
