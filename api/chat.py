@@ -37,7 +37,7 @@ Key upset picks:
 Be concise, confident, and data-driven. Use basketball terminology naturally. Reference specific stats when asked. You can give opinions on bracket picks and strategy."""
 
 FREE_MODELS = [
-    'deepseek/deepseek-r1:free',
+    'stepfun/step-2-16k:free',
     'qwen/qwen3-235b-a22b:free',
     'meta-llama/llama-4-maverick:free',
     'google/gemma-3-27b-it:free',
